@@ -378,22 +378,8 @@ select {
   position: absolute;
   inset: 0;
   background:
-    repeating-linear-gradient(45deg, rgba(15, 118, 110, 0.05) 0 12px, transparent 12px 24px),
-    repeating-linear-gradient(-45deg, rgba(180, 83, 9, 0.05) 0 12px, transparent 12px 24px);
-  z-index: 0;
-}
-
-.qr-panel::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: 10px;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.95) 0 14px, rgba(2, 6, 23, 0.08) 14px 16px, transparent 16px),
-    radial-gradient(circle at 88% 15%, rgba(255, 255, 255, 0.95) 0 12px, rgba(2, 6, 23, 0.08) 12px 14px, transparent 14px),
-    radial-gradient(circle at 10% 88%, rgba(255, 255, 255, 0.95) 0 13px, rgba(2, 6, 23, 0.08) 13px 15px, transparent 15px),
-    radial-gradient(circle at 86% 86%, rgba(255, 255, 255, 0.95) 0 16px, rgba(2, 6, 23, 0.08) 16px 18px, transparent 18px);
-  opacity: 0.55;
+    repeating-linear-gradient(45deg, rgba(15, 118, 110, 0.04) 0 10px, transparent 10px 22px),
+    repeating-linear-gradient(-45deg, rgba(180, 83, 9, 0.035) 0 10px, transparent 10px 22px);
   z-index: 0;
 }
 
@@ -458,10 +444,10 @@ select {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 12% 22%, rgba(15, 118, 110, 0.08) 0 46px, transparent 46px),
-    radial-gradient(circle at 88% 14%, rgba(180, 83, 9, 0.09) 0 38px, transparent 38px),
-    radial-gradient(circle at 82% 82%, rgba(15, 118, 110, 0.08) 0 52px, transparent 52px),
-    radial-gradient(circle at 14% 84%, rgba(180, 83, 9, 0.09) 0 42px, transparent 42px);
+    linear-gradient(135deg, rgba(15, 118, 110, 0.03) 25%, transparent 25%) 0 0 / 26px 26px,
+    linear-gradient(225deg, rgba(180, 83, 9, 0.03) 25%, transparent 25%) 0 0 / 26px 26px,
+    linear-gradient(315deg, rgba(15, 118, 110, 0.03) 25%, transparent 25%) 0 0 / 26px 26px,
+    linear-gradient(45deg, rgba(180, 83, 9, 0.03) 25%, transparent 25%) 0 0 / 26px 26px;
   pointer-events: none;
   z-index: 0;
 }
