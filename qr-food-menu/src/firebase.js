@@ -5,7 +5,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -90,11 +89,17 @@ export async function createShop(adminId = ADMIN_ID, shopId = createShopId()) {
 }
 
 export function subscribeShops(adminId, callback, onError) {
-  const q = query(collection(db, "shops"), where("adminId", "==", adminId), orderBy("createdAt", "desc"));
+  const q = query(collection(db, "shops"), where("adminId", "==", adminId));
   return onSnapshot(
     q,
     (snapshot) => {
-      const shops = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+      const shops = snapshot.docs
+        .map((entry) => ({ id: entry.id, ...entry.data() }))
+        .sort((left, right) => {
+          const leftTime = left.updatedAt?.seconds || left.createdAt?.seconds || 0;
+          const rightTime = right.updatedAt?.seconds || right.createdAt?.seconds || 0;
+          return rightTime - leftTime;
+        });
       callback(shops);
     },
     (error) => {
