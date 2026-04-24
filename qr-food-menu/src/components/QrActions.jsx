@@ -1,10 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useI18n } from "../i18n.jsx";
 
 export default function QrActions({ shopId }) {
   const { t } = useI18n();
   const qrRef = useRef(null);
+  const [showMenuUrl, setShowMenuUrl] = useState(false);
 
   if (!shopId) return null;
 
@@ -59,6 +60,16 @@ export default function QrActions({ shopId }) {
     const qrCanvas = qrRef.current?.querySelector("canvas");
     if (!qrCanvas) return;
 
+    // Hide page elements during poster download
+    const pageElements = [
+      document.querySelector("banner"),
+      document.querySelector(".shop-list"),
+      document.querySelector(".qr-panel ~ p")
+    ];
+    pageElements.forEach(el => {
+      if (el) el.style.display = "none";
+    });
+
     const posterCanvas = document.createElement("canvas");
     posterCanvas.width = 1200;
     posterCanvas.height = 1600;
@@ -91,27 +102,7 @@ export default function QrActions({ shopId }) {
     ctx.font = "700 52px Arial, sans-serif";
     ctx.fillText(document.title || t("appTitle"), width / 2, 220);
 
-    ctx.font = "500 28px Arial, sans-serif";
-    ctx.fillStyle = "#4b5563";
-    ctx.fillText(t("menuUrl"), width / 2, 295);
-
     ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
-
-    ctx.fillStyle = "#111827";
-    ctx.font = "700 34px Arial, sans-serif";
-    ctx.fillText(t("openMenu"), width / 2, 980);
-
-    ctx.fillStyle = "#374151";
-    ctx.font = "400 24px Arial, sans-serif";
-    drawWrappedText(
-      ctx,
-      menuUrl,
-      120,
-      1040,
-      width - 240,
-      34,
-      "400 24px Arial, sans-serif"
-    );
 
     ctx.fillStyle = "#6b7280";
     ctx.font = "400 24px Arial, sans-serif";
@@ -124,6 +115,11 @@ export default function QrActions({ shopId }) {
     document.body.appendChild(tempLink);
     tempLink.click();
     document.body.removeChild(tempLink);
+
+    // Restore page elements
+    pageElements.forEach(el => {
+      if (el) el.style.display = "";
+    });
   };
 
   const scrollToEdit = () => {
@@ -134,14 +130,25 @@ export default function QrActions({ shopId }) {
 
   return (
     <section className="card">
-      <h2>{t("generateQr")}</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>{t("generateQr")}</h2>
+        <button 
+          className="ghost-action-btn" 
+          onClick={() => setShowMenuUrl(!showMenuUrl)}
+          style={{ fontSize: "0.85rem", padding: "4px 8px" }}
+        >
+          {showMenuUrl ? "Hide URL" : "Show URL"}
+        </button>
+      </div>
 
-      <p className="muted-text">
-        <strong>{t("menuUrl")}: </strong>
-        <a href={menuUrl} target="_blank" rel="noreferrer">
-          {menuUrl}
-        </a>
-      </p>
+      {showMenuUrl && (
+        <p className="muted-text">
+          <strong>{t("menuUrl")}: </strong>
+          <a href={menuUrl} target="_blank" rel="noreferrer">
+            {menuUrl}
+          </a>
+        </p>
+      )}
 
       <div className="qr-panel" ref={qrRef}>
         <div className="qr-preview-head">

@@ -140,6 +140,10 @@ a {
   gap: 16px;
 }
 
+.admin-layout.creation-mode {
+  grid-template-columns: 1fr;
+}
+
 .shop-list {
   align-self: flex-start;
 }

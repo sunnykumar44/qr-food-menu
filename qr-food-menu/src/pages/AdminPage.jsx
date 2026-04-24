@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [toast, setToast] = useState("");
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -55,6 +56,7 @@ export default function AdminPage() {
   const handleCreateShop = async () => {
     const newShopId = createShopId();
     setStatus(t("creatingShop"));
+    setIsCreatingNew(true);
     setShops((prev) => [
       {
         id: newShopId,
@@ -131,19 +133,27 @@ export default function AdminPage() {
       await deleteShop(selectedShop.id);
       setToast(t("shopDeleted"));
       setSelectedShopId("");
+      setIsCreatingNew(false);
     } catch (error) {
       setStatus(error?.message || t("updateFailed"));
     }
   };
 
+  const handleSelectShop = (shopId) => {
+    setSelectedShopId(shopId);
+    setIsCreatingNew(false);
+  };
+
   return (
-    <div className="admin-layout">
-      <ShopList
-        shops={shops}
-        selectedShopId={selectedShopId}
-        onSelect={setSelectedShopId}
-        onCreate={handleCreateShop}
-      />
+    <div className={`admin-layout ${isCreatingNew ? "creation-mode" : ""}`}>
+      {!isCreatingNew && (
+        <ShopList
+          shops={shops}
+          selectedShopId={selectedShopId}
+          onSelect={handleSelectShop}
+          onCreate={handleCreateShop}
+        />
+      )}
 
       <section className="admin-main">
         {!selectedShop && <p className="muted-text">{t("selectShopHint")}</p>}
