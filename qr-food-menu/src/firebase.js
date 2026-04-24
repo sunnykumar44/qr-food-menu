@@ -20,13 +20,8 @@ const firebaseConfig = {
   projectId: import.meta.env.VITE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_ID,
+  appId: import.meta.env.VITE_APP_ID
 };
-
-console.log("ENV CHECK:", {
-  apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-});
 
 const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
@@ -61,17 +56,17 @@ export const ADMIN_ID = "demo-admin-001";
 
 export const CATEGORY_KEYS = ["tiffins", "lunch", "dinner"];
 
-export function createShopId() {
-  return doc(collection(db, "shops")).id;
-}
-
-function defaultMenuItems() {
+export function defaultMenuItems() {
   return [
     { id: crypto.randomUUID(), name: "Idli", category: "tiffins", price: "40", enabled: true },
     { id: crypto.randomUUID(), name: "Dosa", category: "tiffins", price: "60", enabled: true },
     { id: crypto.randomUUID(), name: "Veg Meals", category: "lunch", price: "120", enabled: true },
     { id: crypto.randomUUID(), name: "Chicken Biryani", category: "dinner", price: "180", enabled: true }
   ];
+}
+
+export function createShopId() {
+  return doc(collection(db, "shops")).id;
 }
 
 export async function createShop(adminId = ADMIN_ID, shopId = createShopId()) {
@@ -182,8 +177,12 @@ export async function uploadShopImages(shopId, files) {
 
     return Promise.all(uploads);
   } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("Image upload timed out. Please retry with a smaller image or better network.");
+    }
+
     const msg = String(error?.message || "");
-    if (msg.includes("AbortError") || msg.includes("timed out")) {
+    if (msg.includes("timed out")) {
       throw new Error("Image upload timed out. Please retry with a smaller image or better network.");
     }
     if (msg.includes("ImgBB") || msg.includes("upload") || msg.includes("CORS") || msg.includes("Failed to fetch")) {

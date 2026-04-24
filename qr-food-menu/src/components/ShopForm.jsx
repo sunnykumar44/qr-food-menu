@@ -24,6 +24,8 @@ export default function ShopForm({ shop, onSave, saving }) {
 
   if (!shop) return null;
 
+  const existingImages = shop.imageUrls || [];
+
   return (
     <section className="card">
       <h2>{t("shopDetails")}</h2>
@@ -76,6 +78,34 @@ export default function ShopForm({ shop, onSave, saving }) {
             ))}
           </div>
         )}
+
+        <div className="shop-preview-block">
+          <h3>{t("attachmentPreview")}</h3>
+          <div className="preview-list">
+            <div>
+              <span>{t("shopName")}</span>
+              <strong>{form.name || "-"}</strong>
+            </div>
+            <div>
+              <span>{t("mobile")}</span>
+              <strong>{form.mobile || "-"}</strong>
+            </div>
+            <div>
+              <span>{t("description")}</span>
+              <strong>{form.description || "-"}</strong>
+            </div>
+            <div>
+              <span>{t("selectedFiles")}</span>
+              <strong>
+                {files.length > 0 ? files.map((file) => file.name).join(", ") : t("noFilesSelected")}
+              </strong>
+            </div>
+            <div>
+              <span>{t("existingImages")}</span>
+              <strong>{existingImages.length}</strong>
+            </div>
+          </div>
+        </div>
 
         <button type="submit" className="primary-btn" disabled={saving}>
           {saving ? t("saving") : t("saveDetails")}

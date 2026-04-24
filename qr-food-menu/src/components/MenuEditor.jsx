@@ -30,7 +30,11 @@ function ItemRow({ item, onToggle, onName, onPrice, onDelete, t }) {
 
 export default function MenuEditor({ menuItems = [], onChange }) {
   const { t } = useI18n();
-  const [draftNames, setDraftNames] = useState({ tiffins: "", lunch: "", dinner: "" });
+  const [draftItems, setDraftItems] = useState({
+    tiffins: { name: "", price: "" },
+    lunch: { name: "", price: "" },
+    dinner: { name: "", price: "" }
+  });
 
   const updateItem = (id, patch) => {
     const next = menuItems.map((item) => (item.id === id ? { ...item, ...patch } : item));
@@ -43,7 +47,8 @@ export default function MenuEditor({ menuItems = [], onChange }) {
   };
 
   const addItem = (category) => {
-    const name = (draftNames[category] || "").trim();
+    const draft = draftItems[category] || { name: "", price: "" };
+    const name = draft.name.trim();
     if (!name) return;
 
     const next = [
@@ -52,12 +57,15 @@ export default function MenuEditor({ menuItems = [], onChange }) {
         id: crypto.randomUUID(),
         name,
         category,
-        price: "",
+        price: draft.price.trim(),
         enabled: true
       }
     ];
     onChange(next);
-    setDraftNames((prev) => ({ ...prev, [category]: "" }));
+    setDraftItems((prev) => ({
+      ...prev,
+      [category]: { name: "", price: "" }
+    }));
   };
 
   return (
@@ -85,8 +93,25 @@ export default function MenuEditor({ menuItems = [], onChange }) {
             <div className="add-item-row">
               <input
                 placeholder={t("addItemPlaceholder")}
-                value={draftNames[category]}
-                onChange={(e) => setDraftNames((prev) => ({ ...prev, [category]: e.target.value }))}
+                value={draftItems[category]?.name || ""}
+                onChange={(e) =>
+                  setDraftItems((prev) => ({
+                    ...prev,
+                    [category]: { ...(prev[category] || {}), name: e.target.value }
+                  }))
+                }
+              />
+              <input
+                type="number"
+                min="0"
+                placeholder={t("price")}
+                value={draftItems[category]?.price || ""}
+                onChange={(e) =>
+                  setDraftItems((prev) => ({
+                    ...prev,
+                    [category]: { ...(prev[category] || {}), price: e.target.value }
+                  }))
+                }
               />
               <button className="primary-btn" type="button" onClick={() => addItem(category)}>
                 {t("addItem")}

@@ -8,6 +8,7 @@ import {
   createShop,
   createShopId,
   deleteShop,
+  defaultMenuItems,
   subscribeShops,
   updateShop,
   uploadShopImages
@@ -20,6 +21,13 @@ export default function AdminPage() {
   const [selectedShopId, setSelectedShopId] = useState("");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
+  const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timeoutId = window.setTimeout(() => setToast(""), 2200);
+    return () => window.clearTimeout(timeoutId);
+  }, [toast]);
 
   useEffect(() => {
     const unsubscribe = subscribeShops(ADMIN_ID, setShops, (message) => {
@@ -39,6 +47,11 @@ export default function AdminPage() {
     [selectedShopId, shops]
   );
 
+  const visibleMenuItems = useMemo(() => {
+    if (!selectedShop) return [];
+    return selectedShop.menuItems?.length > 0 ? selectedShop.menuItems : defaultMenuItems();
+  }, [selectedShop]);
+
   const handleCreateShop = async () => {
     const newShopId = createShopId();
     setStatus(t("creatingShop"));
@@ -50,7 +63,7 @@ export default function AdminPage() {
         mobile: "",
         description: "",
         imageUrls: [],
-        menuItems: [],
+        menuItems: defaultMenuItems(),
         createdAt: null,
         updatedAt: null
       },
@@ -61,7 +74,7 @@ export default function AdminPage() {
     try {
       const newId = await createShop(ADMIN_ID, newShopId);
       setSelectedShopId(newId);
-      setStatus(t("createSuccess"));
+      setToast(t("createSuccess"));
     } catch (error) {
       setShops((prev) => prev.filter((shop) => shop.id !== newShopId));
       setSelectedShopId((current) => (current === newShopId ? "" : current));
@@ -92,7 +105,8 @@ export default function AdminPage() {
         imageUrls
       });
 
-      setStatus(uploadWarning ? `${t("updateSuccess")} ${uploadWarning}` : t("updateSuccess"));
+      setToast(uploadWarning ? `${t("updateSuccess")} ${uploadWarning}` : t("updateSuccess"));
+      setStatus(uploadWarning || "");
     } catch (error) {
       setStatus(error?.message || t("updateFailed"));
     } finally {
@@ -115,7 +129,7 @@ export default function AdminPage() {
 
     try {
       await deleteShop(selectedShop.id);
-      setStatus(t("shopDeleted"));
+      setToast(t("shopDeleted"));
       setSelectedShopId("");
     } catch (error) {
       setStatus(error?.message || t("updateFailed"));
@@ -136,6 +150,8 @@ export default function AdminPage() {
 
         {selectedShop && (
           <>
+            {toast && <div className="toast-message">{toast}</div>}
+
             <div className="admin-top-actions">
               <button className="danger-btn" onClick={handleDeleteShop}>
                 {t("deleteShop")}
@@ -144,7 +160,7 @@ export default function AdminPage() {
             </div>
 
             <ShopForm shop={selectedShop} onSave={handleSaveDetails} saving={saving} />
-            <MenuEditor menuItems={selectedShop.menuItems || []} onChange={handleMenuChange} />
+            <MenuEditor menuItems={visibleMenuItems} onChange={handleMenuChange} />
             <QrActions shopId={selectedShop.id} />
           </>
         )}

@@ -202,7 +202,7 @@ select {
 
 .add-item-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 140px auto;
   gap: 8px;
 }
 
@@ -241,6 +241,57 @@ select {
   padding: 6px 12px;
   margin: 0;
   font-size: 0.9rem;
+}
+
+.toast-message {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin-bottom: 8px;
+  background: #ecfdf5;
+  border: 1px solid #86efac;
+  color: #166534;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  width: fit-content;
+  box-shadow: var(--shadow);
+}
+
+.shop-preview-block {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #faf7f0;
+  padding: 12px;
+}
+
+.shop-preview-block h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.preview-list {
+  display: grid;
+  gap: 10px;
+}
+
+.preview-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.preview-list span {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.preview-list strong {
+  font-size: 0.95rem;
+  color: var(--ink);
+  word-break: break-word;
 }
 
 .muted-text {
@@ -348,6 +399,10 @@ select {
   }
 
   .menu-row {
+    grid-template-columns: 1fr;
+  }
+
+  .add-item-row {
     grid-template-columns: 1fr;
   }
 
