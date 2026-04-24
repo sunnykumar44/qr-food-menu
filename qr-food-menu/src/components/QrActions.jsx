@@ -50,43 +50,8 @@ export default function QrActions({ shopId }) {
 
   const drawPosterPattern = (ctx, width, height) => {
     ctx.save();
-
-    const tables = [
-      [130, 300],
-      [1070, 300],
-      [130, 1330],
-      [1070, 1330]
-    ];
-
-    tables.forEach(([x, y]) => {
-      ctx.fillStyle = "rgba(255,255,255,0.78)";
-      ctx.strokeStyle = "rgba(17,24,39,0.12)";
-      ctx.lineWidth = 3;
-
-      ctx.beginPath();
-      ctx.roundRect(x - 60, y - 16, 120, 32, 12);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(15, 118, 110, 0.18)";
-      ctx.beginPath();
-      ctx.roundRect(x - 12, y + 10, 24, 66, 10);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.roundRect(x - 80, y - 8, 20, 20, 6);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.roundRect(x + 60, y - 8, 20, 20, 6);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.roundRect(x - 80, y + 32, 20, 20, 6);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.roundRect(x + 60, y + 32, 20, 20, 6);
-      ctx.fill();
-    });
-
+    ctx.fillStyle = "rgba(15, 118, 110, 0.03)";
+    ctx.fillRect(0, 170, width, height - 170);
     ctx.restore();
   };
 
