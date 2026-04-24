@@ -48,6 +48,43 @@ export default function QrActions({ shopId }) {
     return y;
   };
 
+  const drawPosterPattern = (ctx, width, height) => {
+    ctx.save();
+
+    ctx.fillStyle = "rgba(15, 118, 110, 0.05)";
+    for (let x = -height; x < width + height; x += 46) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + height, height);
+      ctx.lineTo(x + height + 12, height);
+      ctx.lineTo(x + 12, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    const plates = [
+      [130, 290, 40],
+      [1070, 280, 34],
+      [140, 1380, 38],
+      [1060, 1370, 42]
+    ];
+
+    plates.forEach(([x, y, r]) => {
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(17,24,39,0.16)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(x, y, r + 4, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  };
+
   const downloadPoster = () => {
     const qrCanvas = qrRef.current?.querySelector("canvas");
     if (!qrCanvas) return;
@@ -65,6 +102,8 @@ export default function QrActions({ shopId }) {
 
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, posterCanvas.height);
+
+    drawPosterPattern(ctx, width, posterCanvas.height);
 
     ctx.fillStyle = "#0f766e";
     ctx.fillRect(0, 0, width, 170);
