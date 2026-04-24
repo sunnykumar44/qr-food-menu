@@ -23,6 +23,11 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
 };
 
+console.log("ENV CHECK:", {
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+});
+
 const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
 const missingEnvKeys = Object.entries(firebaseConfig)
