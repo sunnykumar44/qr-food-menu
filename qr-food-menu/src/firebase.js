@@ -1,0 +1,188 @@
+import { initializeApp } from "firebase/app";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where
+} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
+
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
+
+const missingEnvKeys = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingEnvKeys.length > 0) {
+  throw new Error(
+    `Missing Firebase environment variables: ${missingEnvKeys.join(", ")}. Add them to your local .env file.`
+  );
+}
+
+if (!IMGBB_API_KEY) {
+  throw new Error("Missing VITE_IMGBB_API_KEY. Add it to your local .env file.");
+}
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+
+function toReadableError(error, fallbackMessage) {
+  const message = String(error?.message || "");
+  if (message.includes("firestore.googleapis.com") || message.includes("SERVICE_DISABLED")) {
+    return new Error(
+      "Firestore API is disabled for this project. Enable it in Google Cloud Console, then retry."
+    );
+  }
+  return new Error(fallbackMessage || message || "Request failed.");
+}
+
+export const ADMIN_ID = "demo-admin-001";
+
+export const CATEGORY_KEYS = ["tiffins", "lunch", "dinner"];
+
+export function createShopId() {
+  return doc(collection(db, "shops")).id;
+}
+
+function defaultMenuItems() {
+  return [
+    { id: crypto.randomUUID(), name: "Idli", category: "tiffins", price: "40", enabled: true },
+    { id: crypto.randomUUID(), name: "Dosa", category: "tiffins", price: "60", enabled: true },
+    { id: crypto.randomUUID(), name: "Veg Meals", category: "lunch", price: "120", enabled: true },
+    { id: crypto.randomUUID(), name: "Chicken Biryani", category: "dinner", price: "180", enabled: true }
+  ];
+}
+
+export async function createShop(adminId = ADMIN_ID, shopId = createShopId()) {
+  const shop = {
+    adminId,
+    name: "",
+    mobile: "",
+    description: "",
+    imageUrls: [],
+    menuItems: defaultMenuItems(),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    await setDoc(doc(db, "shops", shopId), shop);
+    return shopId;
+  } catch (error) {
+    throw toReadableError(error, "Unable to create shop.");
+  }
+}
+
+export function subscribeShops(adminId, callback, onError) {
+  const q = query(collection(db, "shops"), where("adminId", "==", adminId), orderBy("createdAt", "desc"));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const shops = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+      callback(shops);
+    },
+    (error) => {
+      if (onError) {
+        onError(toReadableError(error, "Unable to load shops.").message);
+      }
+    }
+  );
+}
+
+export function subscribeShop(shopId, callback, onError) {
+  return onSnapshot(
+    doc(db, "shops", shopId),
+    (snapshot) => {
+      if (!snapshot.exists()) {
+        callback(null);
+        return;
+      }
+      callback({ id: snapshot.id, ...snapshot.data() });
+    },
+    (error) => {
+      if (onError) {
+        onError(toReadableError(error, "Failed to load menu.").message);
+      }
+    }
+  );
+}
+
+export async function updateShop(shopId, patch) {
+  try {
+    await updateDoc(doc(db, "shops", shopId), {
+      ...patch,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    throw toReadableError(error, "Unable to save shop changes.");
+  }
+}
+
+export async function deleteShop(shopId) {
+  try {
+    await deleteDoc(doc(db, "shops", shopId));
+  } catch (error) {
+    throw toReadableError(error, "Unable to delete shop.");
+  }
+}
+
+export async function uploadShopImages(shopId, files) {
+  void shopId;
+
+  try {
+    const uploads = files.map(async (file) => {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const controller = new AbortController();
+      const timeoutMs = 12000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        method: "POST",
+        body: formData,
+        signal: controller.signal
+      }).finally(() => {
+        clearTimeout(timeoutId);
+      });
+
+      if (!response.ok) {
+        throw new Error(`ImgBB upload failed with status ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const imageUrl = payload?.data?.url;
+      if (!payload?.success || !imageUrl) {
+        throw new Error(payload?.error?.message || "ImgBB upload returned an invalid response");
+      }
+
+      return imageUrl;
+    });
+
+    return Promise.all(uploads);
+  } catch (error) {
+    const msg = String(error?.message || "");
+    if (msg.includes("AbortError") || msg.includes("timed out")) {
+      throw new Error("Image upload timed out. Please retry with a smaller image or better network.");
+    }
+    if (msg.includes("ImgBB") || msg.includes("upload") || msg.includes("CORS") || msg.includes("Failed to fetch")) {
+      throw new Error("Image upload failed. Check VITE_IMGBB_API_KEY and your internet connection.");
+    }
+    throw error;
+  }
+}

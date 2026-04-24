@@ -1,0 +1,107 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { CATEGORY_KEYS, subscribeShop } from "../firebase";
+import { useI18n } from "../i18n.jsx";
+import { categoryLabel, groupMenuItems } from "../utils";
+
+export default function CustomerMenuPage() {
+  const { shopId } = useParams();
+  const { t } = useI18n();
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [shop, setShop] = useState(null);
+
+  useEffect(() => {
+    if (!shopId) {
+      setIsLoading(false);
+      setLoadError(t("invalidMenuLink"));
+      return undefined;
+    }
+
+    setIsLoading(true);
+    setLoadError("");
+    setShop(null);
+
+    const timeoutRef = setTimeout(() => {
+      setIsLoading(false);
+      setLoadError(t("menuLoadTimeout"));
+    }, 8000);
+
+    const unsubscribe = subscribeShop(
+      shopId,
+      (nextShop) => {
+        clearTimeout(timeoutRef);
+        setShop(nextShop);
+        setIsLoading(false);
+      },
+      (errorMessage) => {
+        clearTimeout(timeoutRef);
+        setLoadError(errorMessage || t("menuLoadFailed"));
+        setIsLoading(false);
+      }
+    );
+
+    return () => {
+      clearTimeout(timeoutRef);
+      unsubscribe();
+    };
+  }, [shopId, t]);
+
+  if (isLoading) {
+    return <p className="muted-text">{t("loadingMenu")}</p>;
+  }
+
+  if (loadError) {
+    return <p className="muted-text">{loadError}</p>;
+  }
+
+  if (!shop) {
+    return <p className="muted-text">{t("shopNotFound")}</p>;
+  }
+
+  const grouped = groupMenuItems(shop.menuItems || []);
+  const hasAnyItems = CATEGORY_KEYS.some((category) => grouped[category]?.length > 0);
+
+  return (
+    <div className="customer-page card">
+      <div className="customer-head">
+        <div>
+          <h2>{shop.name || t("customerMenu")}</h2>
+          <p>{shop.description}</p>
+          <p className="muted-text">{shop.mobile}</p>
+        </div>
+        <LanguageSwitcher />
+      </div>
+
+      {shop.imageUrls?.length > 0 && (
+        <div className="image-strip">
+          {shop.imageUrls.map((url) => (
+            <img key={url} src={url} alt={shop.name || "shop"} />
+          ))}
+        </div>
+      )}
+
+      {!hasAnyItems && <p>{t("noItems")}</p>}
+
+      {CATEGORY_KEYS.map((category) => {
+        const items = grouped[category] || [];
+        if (items.length === 0) return null;
+
+        return (
+          <section className="menu-section" key={category}>
+            <h3>{categoryLabel(category, t)}</h3>
+            <div className="customer-menu-grid">
+              {items.map((item) => (
+                <article className="customer-item" key={item.id}>
+                  <p>{item.name}</p>
+                  <strong>Rs. {item.price || "0"}</strong>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
