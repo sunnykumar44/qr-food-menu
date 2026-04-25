@@ -708,6 +708,10 @@ select {
   z-index: 100;
 }
 
+.modal-backdrop.modal-top {
+  z-index: 140;
+}
+
 .delete-modal {
   background: var(--paper);
   border: 1px solid var(--line);

@@ -237,7 +237,7 @@ export default function AdminPage() {
       <section className="admin-main">
         {deleteConfirm && (
           <div
-            className="modal-backdrop"
+            className="modal-backdrop modal-top"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 handleCancelDelete();
