@@ -29,6 +29,7 @@ function ItemRow({ item, onToggle, onName, onPrice, onDelete, t }) {
 export default function MenuEditor({ menuItems = [], menuSections = [], onItemsChange, onSectionsChange }) {
   const { t } = useI18n();
   const [draftItems, setDraftItems] = useState({});
+  const [newSectionLabel, setNewSectionLabel] = useState("");
 
   const updateItem = (id, patch) => {
     const next = menuItems.map((item) => (item.id === id ? { ...item, ...patch } : item));
@@ -69,17 +70,52 @@ export default function MenuEditor({ menuItems = [], menuSections = [], onItemsC
     onSectionsChange(nextSections);
   };
 
+  const updateSectionEnabled = (sectionId, enabled) => {
+    const nextSections = menuSections.map((section) =>
+      section.id === sectionId ? { ...section, enabled } : section
+    );
+    onSectionsChange(nextSections);
+  };
+
+  const addSection = () => {
+    const label = newSectionLabel.trim();
+    if (!label) return;
+
+    const sectionId = `section-${crypto.randomUUID().slice(0, 8)}`;
+    const nextSections = [...menuSections, { id: sectionId, label, enabled: true }];
+    onSectionsChange(nextSections);
+    setNewSectionLabel("");
+  };
+
   return (
     <section className="card">
       <h2>{t("menuSetup")}</h2>
+
+      <div className="add-heading-row">
+        <input
+          value={newSectionLabel}
+          onChange={(e) => setNewSectionLabel(e.target.value)}
+          placeholder={t("addHeadingPlaceholder")}
+        />
+        <button className="primary-btn" type="button" onClick={addSection}>
+          {t("addHeading")}
+        </button>
+      </div>
 
       {menuSections.map((section) => {
         const category = section.id;
         const items = menuItems.filter((item) => item.category === section.id);
         return (
-          <div className="category-block" key={section.id}>
+          <div className={`category-block ${section.enabled === false ? "is-disabled" : ""}`} key={section.id}>
             <div className="section-head-row">
-              <h3>{t("sectionHeading")}</h3>
+              <label className="checkbox-wrap section-toggle">
+                <input
+                  type="checkbox"
+                  checked={section.enabled !== false}
+                  onChange={(e) => updateSectionEnabled(section.id, e.target.checked)}
+                />
+                <span>{t("headingEnabled")}</span>
+              </label>
               <input
                 value={section.label || ""}
                 onChange={(e) => updateSectionLabel(section.id, e.target.value)}

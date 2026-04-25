@@ -54,35 +54,37 @@ function toReadableError(error, fallbackMessage) {
 export const ADMIN_ID = "demo-admin-001";
 
 const RESTAURANT_SECTIONS = [
-  { id: "tiffins", label: "Tiffins" },
-  { id: "lunch", label: "Lunch" },
-  { id: "dinner", label: "Dinner" }
+  { id: "tiffins", label: "Tiffins", enabled: true },
+  { id: "lunch", label: "Lunch", enabled: true },
+  { id: "dinner", label: "Dinner", enabled: true }
 ];
 
 const CANTEEN_SECTIONS = [
-  { id: "snacks", label: "Snacks" },
-  { id: "meals", label: "Meals" },
-  { id: "beverages", label: "Beverages" }
+  { id: "snacks", label: "Snacks", enabled: true },
+  { id: "meals", label: "Meals", enabled: true },
+  { id: "beverages", label: "Beverages", enabled: true }
 ];
 
 const SHOP_SECTIONS = [
-  { id: "vegetables", label: "Vegetables" },
-  { id: "grocery", label: "Grocery" },
-  { id: "daily-needs", label: "Daily Needs" }
+  { id: "vegetables", label: "Vegetables", enabled: true },
+  { id: "grocery", label: "Grocery", enabled: true },
+  { id: "daily-needs", label: "Daily Needs", enabled: true }
 ];
 
 const OTHER_SECTIONS = [
-  { id: "section-1", label: "Section 1" },
-  { id: "section-2", label: "Section 2" },
-  { id: "section-3", label: "Section 3" }
+  { id: "section-1", label: "Section 1", enabled: true },
+  { id: "section-2", label: "Section 2", enabled: true },
+  { id: "section-3", label: "Section 3", enabled: true }
 ];
 
 export function defaultMenuSections(businessType = "restaurant") {
   const key = (businessType || "").toLowerCase();
-  if (key === "shop") return SHOP_SECTIONS.map((section) => ({ ...section }));
-  if (key === "canteen") return CANTEEN_SECTIONS.map((section) => ({ ...section }));
-  if (key === "other") return OTHER_SECTIONS.map((section) => ({ ...section }));
-  return RESTAURANT_SECTIONS.map((section) => ({ ...section }));
+  if (key === "shop") return SHOP_SECTIONS.map((section) => ({ ...section, enabled: section.enabled !== false }));
+  if (key === "canteen") {
+    return CANTEEN_SECTIONS.map((section) => ({ ...section, enabled: section.enabled !== false }));
+  }
+  if (key === "other") return OTHER_SECTIONS.map((section) => ({ ...section, enabled: section.enabled !== false }));
+  return RESTAURANT_SECTIONS.map((section) => ({ ...section, enabled: section.enabled !== false }));
 }
 
 export function defaultMenuItems(businessType = "restaurant", sections = defaultMenuSections(businessType)) {

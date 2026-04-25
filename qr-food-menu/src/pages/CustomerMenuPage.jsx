@@ -61,10 +61,11 @@ export default function CustomerMenuPage() {
   }
 
   const grouped = groupMenuItems(shop.menuItems || []);
-  const sections =
+  const allSections =
     shop.menuSections?.length > 0
       ? shop.menuSections
       : defaultMenuSections(shop.businessType || "restaurant");
+  const sections = allSections.filter((section) => section.enabled !== false);
   const hasAnyItems = sections.some((section) => grouped[section.id]?.length > 0);
 
   return (
@@ -96,12 +97,15 @@ export default function CustomerMenuPage() {
           <section className="menu-section" key={section.id}>
             <h3>{section.label || t("sectionHeading")}</h3>
             <div className="customer-menu-grid">
-              {items.map((item) => (
-                <article className="customer-item" key={item.id}>
-                  <p>{item.name}</p>
-                  <strong>Rs. {item.price || "0"}</strong>
-                </article>
-              ))}
+              {items.map((item) => {
+                const showPrice = String(item.price || "").trim().length > 0;
+                return (
+                  <article className="customer-item" key={item.id}>
+                    <p>{item.name}</p>
+                    {showPrice && <strong>Rs. {item.price}</strong>}
+                  </article>
+                );
+              })}
             </div>
           </section>
         );

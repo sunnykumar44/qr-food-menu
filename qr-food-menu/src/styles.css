@@ -260,16 +260,32 @@ select {
   margin-top: 10px;
 }
 
+.add-heading-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .section-head-row {
   display: grid;
-  grid-template-columns: 180px 1fr;
+  grid-template-columns: 190px 1fr;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.section-head-row h3 {
+.section-toggle {
+  display: inline-flex;
+  align-items: center;
   margin: 0;
+}
+
+.category-block.is-disabled {
+  opacity: 0.65;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .menu-row {
@@ -506,6 +522,10 @@ select {
   }
 
   .section-head-row {
+    grid-template-columns: 1fr;
+  }
+
+  .add-heading-row {
     grid-template-columns: 1fr;
   }
 
