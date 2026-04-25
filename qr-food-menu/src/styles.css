@@ -620,6 +620,29 @@ select {
   place-items: center;
   min-height: 300px;
   justify-content: center;
+  text-align: center;
+}
+
+.admin-welcome-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-welcome-copy h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.admin-welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.admin-welcome-actions .primary-btn,
+.admin-welcome-actions .ghost-action-btn {
+  min-width: 220px;
 }
 
 .admin-welcome p {
