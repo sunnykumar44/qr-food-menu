@@ -7,7 +7,7 @@ export default function AppTranslator() {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
-            includedLanguages: "en,te,hi",
+            includedLanguages: "en,te,hi,ta", // added 'ta' for Tamil
             layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
             autoDisplay: false
           },
