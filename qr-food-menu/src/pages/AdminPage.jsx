@@ -349,6 +349,9 @@ export default function AdminPage() {
             {toast && <div className="toast-message">{toast}</div>}
 
             <div className="admin-top-actions">
+              <button className="ghost-action-btn" onClick={() => setShowRecentQR(true)}>
+                {t("viewRecentQR")}
+              </button>
               <button className="danger-btn" onClick={handleDeleteShop}>
                 {t("deleteShop")}
               </button>
