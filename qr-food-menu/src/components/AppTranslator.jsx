@@ -8,7 +8,8 @@ export default function AppTranslator() {
           {
             pageLanguage: "en",
             includedLanguages: "en,te,hi",
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
+            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
           },
           "google_translate_element"
         );

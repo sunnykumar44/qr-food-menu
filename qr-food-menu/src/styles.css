@@ -826,6 +826,14 @@ body {
   background: none !important;
   box-shadow: none !important;
 }
+
+/* Hide new Google Translate Tooltips/Banners */
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf-ti6hGc,
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
+  display: none !important;
+}
+
 #google_translate_element select {
   font: inherit;
   border: 1px solid var(--line);
