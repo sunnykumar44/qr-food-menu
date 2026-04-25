@@ -614,6 +614,17 @@ select {
   margin-top: 12px;
 }
 
+.recent-detail-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.recent-detail-actions .edit-btn {
+  margin-top: 0;
+}
+
 .admin-welcome {
   display: grid;
   gap: 16px;

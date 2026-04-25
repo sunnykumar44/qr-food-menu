@@ -194,8 +194,13 @@ export default function AdminPage() {
     try {
       await deleteShop(deleteConfirm.id);
       setToast(t("shopDeleted"));
-      setSelectedShopId("");
-      setIsCreatingNew(false);
+      if (selectedShopId === deleteConfirm.id) {
+        setSelectedShopId("");
+        setIsCreatingNew(false);
+      }
+      if (previewShopId === deleteConfirm.id) {
+        setPreviewShopId(null);
+      }
       setDeleteConfirm(null);
     } catch (error) {
       setStatus(error?.message || t("updateFailed"));
@@ -212,6 +217,12 @@ export default function AdminPage() {
   const handleCloseRecentQR = () => {
     setShowRecentQR(false);
     setPreviewShopId(null);
+  };
+
+  const handleBackToHome = () => {
+    setSelectedShopId("");
+    setIsCreatingNew(false);
+    setStatus("");
   };
 
   return (
@@ -255,7 +266,7 @@ export default function AdminPage() {
               <div className="recent-qr-header">
                 <h2>{t("viewRecentQR")}</h2>
                 <button className="ghost-action-btn" onClick={handleCloseRecentQR}>
-                  ✕
+                  ← {t("back")}
                 </button>
               </div>
 
@@ -295,16 +306,24 @@ export default function AdminPage() {
                     <QrActions shopId={previewShop.id} />
                   </div>
 
-                  <button
-                    className="primary-btn edit-btn"
-                    onClick={() => {
-                      setShowRecentQR(false);
-                      setSelectedShopId(previewShop.id);
-                      setIsCreatingNew(false);
-                    }}
-                  >
-                    {t("editDetails")}
-                  </button>
+                  <div className="recent-detail-actions">
+                    <button
+                      className="primary-btn edit-btn"
+                      onClick={() => {
+                        setShowRecentQR(false);
+                        setSelectedShopId(previewShop.id);
+                        setIsCreatingNew(false);
+                      }}
+                    >
+                      {t("editDetails")}
+                    </button>
+                    <button
+                      className="danger-btn"
+                      onClick={() => setDeleteConfirm(previewShop)}
+                    >
+                      {t("deleteShop")}
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -333,6 +352,9 @@ export default function AdminPage() {
             {toast && <div className="toast-message">{toast}</div>}
 
             <div className="admin-top-actions">
+              <button className="ghost-action-btn" onClick={handleBackToHome}>
+                ← {t("back")}
+              </button>
               <button className="ghost-action-btn" onClick={() => setShowRecentQR(true)}>
                 {t("viewRecentQR")}
               </button>
