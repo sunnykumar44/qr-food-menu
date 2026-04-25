@@ -238,8 +238,15 @@ export default function AdminPage() {
 
       <section className="admin-main">
         {deleteConfirm && (
-          <div className="modal-backdrop">
-            <div className="delete-modal">
+          <div 
+            className="modal-backdrop"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleCancelDelete();
+              }
+            }}
+          >
+            <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
               <h3>{t("confirmDeleteShop")}</h3>
               <p className="delete-modal-shop-name">{deleteConfirm.name || "Untitled Shop"}</p>
               <p className="muted-text delete-modal-hint">{t("deleteActionCannot")}</p>
@@ -264,8 +271,15 @@ export default function AdminPage() {
         )}
 
         {showRecentQR && (
-          <div className="modal-backdrop">
-            <div className="recent-qr-modal">
+          <div 
+            className="modal-backdrop"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleCloseRecentQR();
+              }
+            }}
+          >
+            <div className="recent-qr-modal" onClick={(e) => e.stopPropagation()}>
               <div className="recent-qr-header">
                 <h2>{t("viewRecentQR")}</h2>
                 <button className="ghost-action-btn" onClick={handleCloseRecentQR}>✕</button>
