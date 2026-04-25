@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+import AppTranslator from "../components/AppTranslator";
 import { defaultMenuSections, subscribeShop } from "../firebase";
 import { useI18n } from "../i18n.jsx";
 import { groupMenuItems } from "../utils";
@@ -76,7 +76,7 @@ export default function CustomerMenuPage() {
           <p>{shop.description}</p>
           <p className="muted-text">{shop.mobile}</p>
         </div>
-        <LanguageSwitcher />
+        <AppTranslator />
       </div>
 
       {shop.imageUrls?.length > 0 && (
