@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import LanguageSwitcher from "../components/LanguageSwitcher";
-import { CATEGORY_KEYS, subscribeShop } from "../firebase";
+import { defaultMenuSections, subscribeShop } from "../firebase";
 import { useI18n } from "../i18n.jsx";
-import { categoryLabel, groupMenuItems } from "../utils";
+import { groupMenuItems } from "../utils";
 
 export default function CustomerMenuPage() {
   const { shopId } = useParams();
@@ -61,7 +61,11 @@ export default function CustomerMenuPage() {
   }
 
   const grouped = groupMenuItems(shop.menuItems || []);
-  const hasAnyItems = CATEGORY_KEYS.some((category) => grouped[category]?.length > 0);
+  const sections =
+    shop.menuSections?.length > 0
+      ? shop.menuSections
+      : defaultMenuSections(shop.businessType || "restaurant");
+  const hasAnyItems = sections.some((section) => grouped[section.id]?.length > 0);
 
   return (
     <div className="customer-page card">
@@ -84,13 +88,13 @@ export default function CustomerMenuPage() {
 
       {!hasAnyItems && <p>{t("noItems")}</p>}
 
-      {CATEGORY_KEYS.map((category) => {
-        const items = grouped[category] || [];
+      {sections.map((section) => {
+        const items = grouped[section.id] || [];
         if (items.length === 0) return null;
 
         return (
-          <section className="menu-section" key={category}>
-            <h3>{categoryLabel(category, t)}</h3>
+          <section className="menu-section" key={section.id}>
+            <h3>{section.label || t("sectionHeading")}</h3>
             <div className="customer-menu-grid">
               {items.map((item) => (
                 <article className="customer-item" key={item.id}>

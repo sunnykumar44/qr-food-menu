@@ -1,4 +1,5 @@
 import { useI18n } from "../i18n.jsx";
+import { businessTypeLabel } from "../utils";
 
 function formatShopTime(shop) {
   const timestamp = shop.updatedAt || shop.createdAt;
@@ -42,6 +43,7 @@ export default function ShopList({ shops, selectedShopId, onSelect, onCreate }) 
               type="button"
             >
               <strong>{shop.name?.trim() || "Untitled Shop"}</strong>
+              <span>{businessTypeLabel(shop.businessType, shop.businessTypeCustom, t)}</span>
               <span>{shop.mobile || "--"}</span>
               <small>{formatShopTime(shop)}</small>
             </button>

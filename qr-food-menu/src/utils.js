@@ -1,9 +1,3 @@
-export function categoryLabel(key, t) {
-  if (key === "tiffins") return t("tiffins");
-  if (key === "lunch") return t("lunch");
-  return t("dinner");
-}
-
 export function groupMenuItems(menuItems = []) {
   return menuItems
     .filter((item) => item.enabled)
@@ -15,6 +9,14 @@ export function groupMenuItems(menuItems = []) {
         acc[item.category].push(item);
         return acc;
       },
-      { tiffins: [], lunch: [], dinner: [] }
+      {}
     );
+}
+
+export function businessTypeLabel(type, customType, t) {
+  if (type === "restaurant") return t("restaurantType");
+  if (type === "canteen") return t("canteenType");
+  if (type === "shop") return t("shopType");
+  if (type === "other") return customType?.trim() || t("otherType");
+  return "-";
 }

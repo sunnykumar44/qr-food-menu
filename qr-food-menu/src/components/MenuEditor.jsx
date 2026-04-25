@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { CATEGORY_KEYS } from "../firebase";
 import { useI18n } from "../i18n.jsx";
-import { categoryLabel } from "../utils";
 
 function ItemRow({ item, onToggle, onName, onPrice, onDelete, t }) {
   return (
@@ -28,22 +26,18 @@ function ItemRow({ item, onToggle, onName, onPrice, onDelete, t }) {
   );
 }
 
-export default function MenuEditor({ menuItems = [], onChange }) {
+export default function MenuEditor({ menuItems = [], menuSections = [], onItemsChange, onSectionsChange }) {
   const { t } = useI18n();
-  const [draftItems, setDraftItems] = useState({
-    tiffins: { name: "", price: "" },
-    lunch: { name: "", price: "" },
-    dinner: { name: "", price: "" }
-  });
+  const [draftItems, setDraftItems] = useState({});
 
   const updateItem = (id, patch) => {
     const next = menuItems.map((item) => (item.id === id ? { ...item, ...patch } : item));
-    onChange(next);
+    onItemsChange(next);
   };
 
   const removeItem = (id) => {
     const next = menuItems.filter((item) => item.id !== id);
-    onChange(next);
+    onItemsChange(next);
   };
 
   const addItem = (category) => {
@@ -61,22 +55,37 @@ export default function MenuEditor({ menuItems = [], onChange }) {
         enabled: true
       }
     ];
-    onChange(next);
+    onItemsChange(next);
     setDraftItems((prev) => ({
       ...prev,
       [category]: { name: "", price: "" }
     }));
   };
 
+  const updateSectionLabel = (sectionId, label) => {
+    const nextSections = menuSections.map((section) =>
+      section.id === sectionId ? { ...section, label } : section
+    );
+    onSectionsChange(nextSections);
+  };
+
   return (
     <section className="card">
       <h2>{t("menuSetup")}</h2>
 
-      {CATEGORY_KEYS.map((category) => {
-        const items = menuItems.filter((item) => item.category === category);
+      {menuSections.map((section) => {
+        const category = section.id;
+        const items = menuItems.filter((item) => item.category === section.id);
         return (
-          <div className="category-block" key={category}>
-            <h3>{categoryLabel(category, t)}</h3>
+          <div className="category-block" key={section.id}>
+            <div className="section-head-row">
+              <h3>{t("sectionHeading")}</h3>
+              <input
+                value={section.label || ""}
+                onChange={(e) => updateSectionLabel(section.id, e.target.value)}
+                placeholder={t("sectionHeadingPlaceholder")}
+              />
+            </div>
 
             {items.map((item) => (
               <ItemRow

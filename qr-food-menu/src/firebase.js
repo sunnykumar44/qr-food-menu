@@ -53,14 +53,70 @@ function toReadableError(error, fallbackMessage) {
 
 export const ADMIN_ID = "demo-admin-001";
 
-export const CATEGORY_KEYS = ["tiffins", "lunch", "dinner"];
+const RESTAURANT_SECTIONS = [
+  { id: "tiffins", label: "Tiffins" },
+  { id: "lunch", label: "Lunch" },
+  { id: "dinner", label: "Dinner" }
+];
 
-export function defaultMenuItems() {
+const CANTEEN_SECTIONS = [
+  { id: "snacks", label: "Snacks" },
+  { id: "meals", label: "Meals" },
+  { id: "beverages", label: "Beverages" }
+];
+
+const SHOP_SECTIONS = [
+  { id: "vegetables", label: "Vegetables" },
+  { id: "grocery", label: "Grocery" },
+  { id: "daily-needs", label: "Daily Needs" }
+];
+
+const OTHER_SECTIONS = [
+  { id: "section-1", label: "Section 1" },
+  { id: "section-2", label: "Section 2" },
+  { id: "section-3", label: "Section 3" }
+];
+
+export function defaultMenuSections(businessType = "restaurant") {
+  const key = (businessType || "").toLowerCase();
+  if (key === "shop") return SHOP_SECTIONS.map((section) => ({ ...section }));
+  if (key === "canteen") return CANTEEN_SECTIONS.map((section) => ({ ...section }));
+  if (key === "other") return OTHER_SECTIONS.map((section) => ({ ...section }));
+  return RESTAURANT_SECTIONS.map((section) => ({ ...section }));
+}
+
+export function defaultMenuItems(businessType = "restaurant", sections = defaultMenuSections(businessType)) {
+  if (!sections.length) return [];
+
+  if (businessType === "shop") {
+    return [
+      { id: crypto.randomUUID(), name: "Tomato", category: sections[0].id, price: "30", enabled: true },
+      { id: crypto.randomUUID(), name: "Potato", category: sections[0].id, price: "28", enabled: true },
+      { id: crypto.randomUUID(), name: "Rice (1kg)", category: sections[1].id, price: "60", enabled: true },
+      { id: crypto.randomUUID(), name: "Wheat Flour (1kg)", category: sections[1].id, price: "45", enabled: true },
+      { id: crypto.randomUUID(), name: "Soap", category: sections[2].id, price: "35", enabled: true }
+    ];
+  }
+
+  if (businessType === "canteen") {
+    return [
+      { id: crypto.randomUUID(), name: "Samosa", category: sections[0].id, price: "20", enabled: true },
+      { id: crypto.randomUUID(), name: "Veg Meals", category: sections[1].id, price: "90", enabled: true },
+      { id: crypto.randomUUID(), name: "Tea", category: sections[2].id, price: "15", enabled: true }
+    ];
+  }
+
   return [
-    { id: crypto.randomUUID(), name: "Idli", category: "tiffins", price: "40", enabled: true },
-    { id: crypto.randomUUID(), name: "Dosa", category: "tiffins", price: "60", enabled: true },
-    { id: crypto.randomUUID(), name: "Veg Meals", category: "lunch", price: "120", enabled: true },
-    { id: crypto.randomUUID(), name: "Chicken Biryani", category: "dinner", price: "180", enabled: true }
+    { id: crypto.randomUUID(), name: "Idli", category: sections[0].id, price: "40", enabled: true },
+    { id: crypto.randomUUID(), name: "Dosa", category: sections[0].id, price: "60", enabled: true },
+    { id: crypto.randomUUID(), name: "Veg Meals", category: sections[1]?.id || sections[0].id, price: "120", enabled: true },
+    {
+      id: crypto.randomUUID(),
+      name: "Chicken Biryani",
+      category: sections[2]?.id || sections[0].id,
+      price: "180",
+      enabled: true
+    }
   ];
 }
 
@@ -71,11 +127,14 @@ export function createShopId() {
 export async function createShop(adminId = ADMIN_ID, shopId = createShopId()) {
   const shop = {
     adminId,
+    businessType: "",
+    businessTypeCustom: "",
     name: "",
     mobile: "",
     description: "",
     imageUrls: [],
-    menuItems: defaultMenuItems(),
+    menuSections: [],
+    menuItems: [],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };

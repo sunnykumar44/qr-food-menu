@@ -192,6 +192,34 @@ a {
   gap: 14px;
 }
 
+.business-type-card {
+  display: grid;
+  gap: 12px;
+}
+
+.business-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.business-type-option {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.business-type-option.active {
+  border-color: var(--brand);
+  background: #eaf8f7;
+  color: var(--brand-dark);
+}
+
 .shop-form {
   display: grid;
   gap: 10px;
@@ -230,6 +258,18 @@ select {
   border-top: 1px dashed var(--line);
   padding-top: 10px;
   margin-top: 10px;
+}
+
+.section-head-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-head-row h3 {
+  margin: 0;
 }
 
 .menu-row {
@@ -462,6 +502,10 @@ select {
   }
 
   .menu-row {
+    grid-template-columns: 1fr;
+  }
+
+  .section-head-row {
     grid-template-columns: 1fr;
   }
 

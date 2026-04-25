@@ -8,12 +8,16 @@ import {
   createShop,
   createShopId,
   deleteShop,
+  defaultMenuSections,
   defaultMenuItems,
   subscribeShops,
   updateShop,
   uploadShopImages
 } from "../firebase";
 import { useI18n } from "../i18n.jsx";
+import { businessTypeLabel } from "../utils";
+
+const BUSINESS_TYPE_OPTIONS = ["restaurant", "canteen", "shop", "other"];
 
 export default function AdminPage() {
   const { t } = useI18n();
@@ -23,6 +27,8 @@ export default function AdminPage() {
   const [status, setStatus] = useState("");
   const [toast, setToast] = useState("");
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [newBusinessType, setNewBusinessType] = useState("restaurant");
+  const [newBusinessTypeCustom, setNewBusinessTypeCustom] = useState("");
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -48,24 +54,41 @@ export default function AdminPage() {
     [selectedShopId, shops]
   );
 
+  const visibleMenuSections = useMemo(() => {
+    if (!selectedShop) return [];
+    return selectedShop.menuSections?.length > 0
+      ? selectedShop.menuSections
+      : defaultMenuSections(selectedShop.businessType || "restaurant");
+  }, [selectedShop]);
+
   const visibleMenuItems = useMemo(() => {
     if (!selectedShop) return [];
-    return selectedShop.menuItems?.length > 0 ? selectedShop.menuItems : defaultMenuItems();
-  }, [selectedShop]);
+    return selectedShop.menuItems?.length > 0
+      ? selectedShop.menuItems
+      : defaultMenuItems(selectedShop.businessType || "restaurant", visibleMenuSections);
+  }, [selectedShop, visibleMenuSections]);
+
+  const needsBusinessTypeSelection =
+    isCreatingNew && selectedShop && !selectedShop.businessType;
 
   const handleCreateShop = async () => {
     const newShopId = createShopId();
     setStatus(t("creatingShop"));
     setIsCreatingNew(true);
+    setNewBusinessType("restaurant");
+    setNewBusinessTypeCustom("");
     setShops((prev) => [
       {
         id: newShopId,
         adminId: ADMIN_ID,
+        businessType: "",
+        businessTypeCustom: "",
         name: "",
         mobile: "",
         description: "",
         imageUrls: [],
-        menuItems: defaultMenuItems(),
+        menuSections: [],
+        menuItems: [],
         createdAt: null,
         updatedAt: null
       },
@@ -80,6 +103,28 @@ export default function AdminPage() {
     } catch (error) {
       setShops((prev) => prev.filter((shop) => shop.id !== newShopId));
       setSelectedShopId((current) => (current === newShopId ? "" : current));
+      setStatus(error?.message || t("updateFailed"));
+    }
+  };
+
+  const handleSaveBusinessType = async () => {
+    if (!selectedShop) return;
+
+    if (newBusinessType === "other" && !newBusinessTypeCustom.trim()) {
+      setStatus(t("businessTypeRequired"));
+      return;
+    }
+
+    try {
+      const sections = defaultMenuSections(newBusinessType);
+      await updateShop(selectedShop.id, {
+        businessType: newBusinessType,
+        businessTypeCustom: newBusinessType === "other" ? newBusinessTypeCustom.trim() : "",
+        menuSections: sections,
+        menuItems: defaultMenuItems(newBusinessType, sections)
+      });
+      setStatus("");
+    } catch (error) {
       setStatus(error?.message || t("updateFailed"));
     }
   };
@@ -116,10 +161,19 @@ export default function AdminPage() {
     }
   };
 
-  const handleMenuChange = async (nextMenuItems) => {
+  const handleMenuItemsChange = async (nextMenuItems) => {
     if (!selectedShop) return;
     try {
       await updateShop(selectedShop.id, { menuItems: nextMenuItems });
+    } catch {
+      setStatus(t("updateFailed"));
+    }
+  };
+
+  const handleMenuSectionsChange = async (nextSections) => {
+    if (!selectedShop) return;
+    try {
+      await updateShop(selectedShop.id, { menuSections: nextSections });
     } catch {
       setStatus(t("updateFailed"));
     }
@@ -166,12 +220,60 @@ export default function AdminPage() {
               <button className="danger-btn" onClick={handleDeleteShop}>
                 {t("deleteShop")}
               </button>
+              {selectedShop.businessType && (
+                <p className="status-pill">{businessTypeLabel(selectedShop.businessType, selectedShop.businessTypeCustom, t)}</p>
+              )}
               {status && <p className="status-pill">{status}</p>}
             </div>
 
-            <ShopForm shop={selectedShop} onSave={handleSaveDetails} saving={saving} />
-            <MenuEditor menuItems={visibleMenuItems} onChange={handleMenuChange} />
-            <QrActions shopId={selectedShop.id} />
+            {needsBusinessTypeSelection ? (
+              <section className="card business-type-card">
+                <h2>{t("selectBusinessType")}</h2>
+                <p className="muted-text">{t("businessTypeHint")}</p>
+
+                <div className="business-type-grid">
+                  {BUSINESS_TYPE_OPTIONS.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      className={`business-type-option ${newBusinessType === type ? "active" : ""}`}
+                      onClick={() => setNewBusinessType(type)}
+                    >
+                      {type === "restaurant" && t("restaurantType")}
+                      {type === "canteen" && t("canteenType")}
+                      {type === "shop" && t("shopType")}
+                      {type === "other" && t("otherType")}
+                    </button>
+                  ))}
+                </div>
+
+                {newBusinessType === "other" && (
+                  <label>
+                    <span>{t("otherType")}</span>
+                    <input
+                      value={newBusinessTypeCustom}
+                      onChange={(e) => setNewBusinessTypeCustom(e.target.value)}
+                      placeholder={t("otherTypePlaceholder")}
+                    />
+                  </label>
+                )}
+
+                <button type="button" className="primary-btn" onClick={handleSaveBusinessType}>
+                  {t("continueToDetails")}
+                </button>
+              </section>
+            ) : (
+              <>
+                <ShopForm shop={selectedShop} onSave={handleSaveDetails} saving={saving} />
+                <MenuEditor
+                  menuItems={visibleMenuItems}
+                  menuSections={visibleMenuSections}
+                  onItemsChange={handleMenuItemsChange}
+                  onSectionsChange={handleMenuSectionsChange}
+                />
+                <QrActions shopId={selectedShop.id} />
+              </>
+            )}
           </>
         )}
       </section>

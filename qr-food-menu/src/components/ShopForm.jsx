@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "../i18n.jsx";
+import { businessTypeLabel } from "../utils";
 
 export default function ShopForm({ shop, onSave, saving }) {
   const { t } = useI18n();
-  const [form, setForm] = useState({ name: "", mobile: "", description: "" });
+  const [form, setForm] = useState({
+    businessType: "restaurant",
+    businessTypeCustom: "",
+    name: "",
+    mobile: "",
+    description: ""
+  });
   const [files, setFiles] = useState([]);
 
   useEffect(() => {
     setForm({
+      businessType: shop?.businessType || "restaurant",
+      businessTypeCustom: shop?.businessTypeCustom || "",
       name: shop?.name || "",
       mobile: shop?.mobile || "",
       description: shop?.description || ""
     });
     setFiles([]);
-  }, [shop?.id, shop?.name, shop?.mobile, shop?.description]);
+  }, [shop?.id, shop?.businessType, shop?.businessTypeCustom, shop?.name, shop?.mobile, shop?.description]);
 
   const updateField = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -31,6 +40,32 @@ export default function ShopForm({ shop, onSave, saving }) {
       <h2>{t("shopDetails")}</h2>
 
       <form className="shop-form" onSubmit={submit}>
+        <label>
+          <span>{t("businessType")}</span>
+          <select
+            value={form.businessType}
+            onChange={(e) => updateField("businessType", e.target.value)}
+            required
+          >
+            <option value="restaurant">{t("restaurantType")}</option>
+            <option value="canteen">{t("canteenType")}</option>
+            <option value="shop">{t("shopType")}</option>
+            <option value="other">{t("otherType")}</option>
+          </select>
+        </label>
+
+        {form.businessType === "other" && (
+          <label>
+            <span>{t("otherType")}</span>
+            <input
+              value={form.businessTypeCustom}
+              onChange={(e) => updateField("businessTypeCustom", e.target.value)}
+              placeholder={t("otherTypePlaceholder")}
+              required
+            />
+          </label>
+        )}
+
         <label>
           <span>{t("shopName")}</span>
           <input
@@ -82,6 +117,10 @@ export default function ShopForm({ shop, onSave, saving }) {
         <div className="shop-preview-block">
           <h3>{t("attachmentPreview")}</h3>
           <div className="preview-list">
+            <div>
+              <span>{t("businessType")}</span>
+              <strong>{businessTypeLabel(form.businessType, form.businessTypeCustom, t)}</strong>
+            </div>
             <div>
               <span>{t("shopName")}</span>
               <strong>{form.name || "-"}</strong>
