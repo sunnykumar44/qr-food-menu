@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, Route, Routes } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import AdminPage from "./pages/AdminPage";
 import CustomerMenuPage from "./pages/CustomerMenuPage";
 import LanguageSwitcher from "./components/LanguageSwitcher";
@@ -14,39 +14,44 @@ const THEMES = [
 export default function App() {
   const { t } = useI18n();
   const [theme, setTheme] = useState(() => localStorage.getItem("qr-food-theme") || THEMES[0].id);
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("qr-food-theme", theme);
   }, [theme]);
 
+  const isCustomerPage = location.pathname.startsWith("/menu/");
+
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <div className="brand-wrap">
-          <div className="brand-badge">QR</div>
-          <div>
-            <h1>{t("appTitle")}</h1>
-            <p>{t("appSubtitle")}</p>
+      {!isCustomerPage && (
+        <header className="topbar">
+          <div className="brand-wrap">
+            <div className="brand-badge">QR</div>
+            <div>
+              <h1>{t("appTitle")}</h1>
+              <p>{t("appSubtitle")}</p>
+            </div>
           </div>
-        </div>
-        <div className="topbar-actions">
-          <Link className="ghost-btn" to="/admin">
-            {t("admin")}
-          </Link>
-          <label className="theme-switch">
-            <span>{t("theme")}</span>
-            <select value={theme} onChange={(e) => setTheme(e.target.value)}>
-              {THEMES.map((entry) => (
-                <option key={entry.id} value={entry.id}>
-                  {t(entry.labelKey)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <LanguageSwitcher />
-        </div>
-      </header>
+          <div className="topbar-actions">
+            <Link className="ghost-btn" to="/admin">
+              {t("admin")}
+            </Link>
+            <label className="theme-switch">
+              <span>{t("theme")}</span>
+              <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+                {THEMES.map((entry) => (
+                  <option key={entry.id} value={entry.id}>
+                    {t(entry.labelKey)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <LanguageSwitcher />
+          </div>
+        </header>
+      )}
 
       <main className="page-wrap">
         <Routes>
