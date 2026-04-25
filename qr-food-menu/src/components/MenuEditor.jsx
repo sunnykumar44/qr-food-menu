@@ -42,8 +42,8 @@ export default function MenuEditor({ menuItems = [], menuSections = [], onItemsC
   };
 
   const addItem = (category) => {
-    const draft = draftItems[category] || { name: "", price: "" };
-    const name = draft.name.trim();
+    const draft = draftItems[category] || {};
+    const name = (draft.name || "").trim();
     if (!name) return;
 
     const next = [
@@ -52,7 +52,7 @@ export default function MenuEditor({ menuItems = [], menuSections = [], onItemsC
         id: crypto.randomUUID(),
         name,
         category,
-        price: draft.price.trim(),
+        price: (draft.price || "").trim(),
         enabled: true
       }
     ];
