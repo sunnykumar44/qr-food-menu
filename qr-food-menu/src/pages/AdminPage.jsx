@@ -29,6 +29,10 @@ export default function AdminPage() {
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [newBusinessType, setNewBusinessType] = useState("restaurant");
   const [newBusinessTypeCustom, setNewBusinessTypeCustom] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showRecentQR, setShowRecentQR] = useState(false);
+  const [previewShopId, setPreviewShopId] = useState(null);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -179,18 +183,41 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteShop = async () => {
+  const handleDeleteShop = () => {
     if (!selectedShop) return;
-    if (!window.confirm(t("confirmDeleteShop"))) return;
+    setDeleteConfirm(selectedShop);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return;
+    setIsDeleting(true);
 
     try {
-      await deleteShop(selectedShop.id);
+      await deleteShop(deleteConfirm.id);
       setToast(t("shopDeleted"));
       setSelectedShopId("");
       setIsCreatingNew(false);
+      setDeleteConfirm(null);
     } catch (error) {
       setStatus(error?.message || t("updateFailed"));
+      setDeleteConfirm(null);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirm(null);
+  };
+
+  const previewShop = useMemo(
+    () => shops.find((shop) => shop.id === previewShopId),
+    [previewShopId, shops]
+  );
+
+  const handleCloseRecentQR = () => {
+    setShowRecentQR(false);
+    setPreviewShopId(null);
   };
 
   const handleSelectShop = (shopId) => {
@@ -210,7 +237,98 @@ export default function AdminPage() {
       )}
 
       <section className="admin-main">
-        {!selectedShop && <p className="muted-text">{t("selectShopHint")}</p>}
+        {deleteConfirm && (
+          <div className="modal-backdrop">
+            <div className="delete-modal">
+              <h3>{t("confirmDeleteShop")}</h3>
+              <p className="delete-modal-shop-name">{deleteConfirm.name || "Untitled Shop"}</p>
+              <p className="muted-text delete-modal-hint">{t("deleteActionCannot")}</p>
+              <div className="delete-modal-actions">
+                <button
+                  className="danger-btn"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? t("deleting") : t("yesDeletePermanently")}
+                </button>
+                <button
+                  className="ghost-action-btn"
+                  onClick={handleCancelDelete}
+                  disabled={isDeleting}
+                >
+                  {t("cancelDelete")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showRecentQR && (
+          <div className="modal-backdrop">
+            <div className="recent-qr-modal">
+              <div className="recent-qr-header">
+                <h2>{t("viewRecentQR")}</h2>
+                <button className="ghost-action-btn" onClick={handleCloseRecentQR}>✕</button>
+              </div>
+
+              {!previewShopId ? (
+                <div className="recent-shops-list">
+                  {shops.length === 0 && <p className="muted-text">{t("noShops")}</p>}
+                  {shops.map((shop) => (
+                    <button
+                      key={shop.id}
+                      className="recent-shop-item"
+                      onClick={() => setPreviewShopId(shop.id)}
+                    >
+                      <div className="recent-shop-info">
+                        <strong>{shop.name || "Untitled Shop"}</strong>
+                        <p className="muted-text">{businessTypeLabel(shop.businessType, shop.businessTypeCustom, t)}</p>
+                        <span className="muted-text">{shop.mobile || "--"}</span>
+                      </div>
+                      <span className="arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              ) : previewShop ? (
+                <div className="recent-qr-detail">
+                  <button className="ghost-action-btn back-btn" onClick={() => setPreviewShopId(null)}>← {t("back")}</button>
+                  <h3>{previewShop.name || "Untitled Shop"}</h3>
+                  <p className="muted-text">{businessTypeLabel(previewShop.businessType, previewShop.businessTypeCustom, t)}</p>
+                  {previewShop.mobile && <p>{previewShop.mobile}</p>}
+                  {previewShop.description && <p>{previewShop.description}</p>}
+
+                  {previewShop.imageUrls?.length > 0 && (
+                    <div className="image-strip-preview">
+                      {previewShop.imageUrls.slice(0, 3).map((url) => (
+                        <img key={url} src={url} alt={previewShop.name || "shop"} />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="recent-qr-code-section">
+                    <QrActions shopId={previewShop.id} />
+                  </div>
+
+                  <button className="primary-btn edit-btn" onClick={() => {
+                    setShowRecentQR(false);
+                    setSelectedShopId(previewShop.id);
+                  }}>
+                    {t("editDetails")}
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {!selectedShop && !showRecentQR && (
+          <div className="admin-welcome">
+            <p className="muted-text">{t("selectShopHint")}</p>
+            <button className="primary-btn" onClick={() => setShowRecentQR(true)}>
+              {t("viewRecentQR")}
+            </button>
+          </div>
+        )}
 
         {selectedShop && (
           <>

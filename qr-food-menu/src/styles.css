@@ -477,6 +477,156 @@ select {
   font-weight: 600;
 }
 
+.recent-qr-modal {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  height: 80vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.3s ease-out;
+}
+
+.recent-qr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+
+.recent-qr-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.recent-qr-header button {
+  font-size: 1.5rem;
+  padding: 4px 8px;
+}
+
+.recent-shops-list {
+  overflow-y: auto;
+  flex: 1;
+  display: grid;
+  gap: 10px;
+}
+
+.recent-shop-item {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.recent-shop-item:hover {
+  border-color: var(--brand);
+  background: #eaf8f7;
+}
+
+.recent-shop-info {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.recent-shop-info strong {
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.recent-shop-info p,
+.recent-shop-info span {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.recent-shop-item .arrow {
+  color: var(--brand);
+  font-size: 1.2rem;
+  margin-left: 12px;
+}
+
+.recent-qr-detail {
+  overflow-y: auto;
+  flex: 1;
+  display: grid;
+  gap: 12px;
+}
+
+.back-btn {
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.recent-qr-detail h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.recent-qr-detail > p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.image-strip-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.image-strip-preview img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.recent-qr-code-section {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+.recent-qr-code-section .qr-panel {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+.edit-btn {
+  margin-top: 12px;
+}
+
+.admin-welcome {
+  display: grid;
+  gap: 16px;
+  place-items: center;
+  min-height: 300px;
+  justify-content: center;
+}
+
+.admin-welcome p {
+  margin: 0;
+  text-align: center;
+}
+
 .customer-page {
   display: grid;
   gap: 14px;
@@ -512,6 +662,69 @@ select {
   font-weight: 600;
 }
 
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+.delete-modal {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-modal h3 {
+  margin: 0 0 12px;
+  color: var(--danger);
+  font-size: 1.1rem;
+}
+
+.delete-modal-shop-name {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.delete-modal-hint {
+  margin: 0 0 20px;
+  font-size: 0.9rem;
+}
+
+.delete-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.delete-modal-actions button {
+  padding: 12px 16px;
+}
+
 @media (max-width: 900px) {
   .admin-layout {
     grid-template-columns: 1fr;
@@ -540,5 +753,19 @@ select {
   .topbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .delete-modal-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-qr-modal {
+    max-width: 95vw;
+    width: 100%;
+    max-height: 90vh;
+  }
+
+  .image-strip-preview {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   }
 }

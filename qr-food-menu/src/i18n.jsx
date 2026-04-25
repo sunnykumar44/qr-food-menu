@@ -78,7 +78,13 @@ const dictionary = {
     updateFailed: "Something went wrong. Please try again.",
     shopDeleted: "Shop deleted.",
     confirmDeleteShop: "Are you sure you want to delete this shop?",
+    deleteActionCannot: "This action cannot be undone.",
+    yesDeletePermanently: "Yes, Delete Permanently",
+    cancelDelete: "Cancel",
+    deleting: "Deleting...",
     selectShopHint: "Select or create a shop to manage details and menu.",
+    viewRecentQR: "View Recent QR Created",
+    back: "Back",
     addItemPlaceholder: "Example: Dosa"
   },
   te: {
@@ -158,7 +164,17 @@ const dictionary = {
     updateFailed: "లోపం జరిగింది. మళ్లీ ప్రయత్నించండి.",
     shopDeleted: "షాప్ తొలగించబడింది.",
     confirmDeleteShop: "ఈ షాప్ ను తొలగించాలనుకుంటున్నారా?",
+    deleteActionCannot: "ఈ చర్యను రద్దు చేయలేము.",
+    yesDeletePermanently: "అవును, శాశ్వతంగా తొలగించండి",
+    cancelDelete: "రద్దు చేయండి",
+    deleting: "తొలగిస్తోంది...",
+    deleteActionCannot: "ఈ చర్యను రద్దు చేయలేము.",
+    yesDeletePermanently: "అవును, శాశ్వతంగా తొలగించండి",
+    cancelDelete: "రద్దు చేయండి",
+    deleting: "తొలగిస్తోంది...",
     selectShopHint: "వివరాలు మరియు మెనూ నిర్వహించడానికి షాప్ ఎంచుకోండి లేదా సృష్టించండి.",
+    viewRecentQR: "ఇటీవల సృష్టించిన QR చూడండి",
+    back: "వెనుకకు",
     addItemPlaceholder: "ఉదాహరణ: దోసె"
   }
 };
