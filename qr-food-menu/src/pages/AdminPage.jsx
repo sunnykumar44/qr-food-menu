@@ -187,6 +187,13 @@ export default function AdminPage() {
     setDeleteConfirm(selectedShop);
   };
 
+  const handleDeleteFromRecent = (shop) => {
+    if (!shop) return;
+    setShowRecentQR(false);
+    setPreviewShopId(null);
+    setDeleteConfirm(shop);
+  };
+
   const handleConfirmDelete = async () => {
     if (!deleteConfirm) return;
     setIsDeleting(true);
@@ -319,7 +326,7 @@ export default function AdminPage() {
                     </button>
                     <button
                       className="danger-btn"
-                      onClick={() => setDeleteConfirm(previewShop)}
+                      onClick={() => handleDeleteFromRecent(previewShop)}
                     >
                       {t("deleteShop")}
                     </button>
