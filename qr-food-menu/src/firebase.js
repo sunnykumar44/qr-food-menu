@@ -9,7 +9,8 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-  where
+  where,
+  increment
 } from "firebase/firestore";
 import { getFirestore } from "firebase/firestore";
 
@@ -197,6 +198,16 @@ export async function updateShop(shopId, patch) {
     });
   } catch (error) {
     throw toReadableError(error, "Unable to save shop changes.");
+  }
+}
+
+export async function incrementShopViewCount(shopId) {
+  try {
+    await updateDoc(doc(db, "shops", shopId), {
+      viewCount: increment(1)
+    });
+  } catch (error) {
+    console.error("Failed to increment view count", error);
   }
 }
 

@@ -294,7 +294,10 @@ export default function AdminPage() {
                         <div className="recent-shop-info">
                           <strong>{shop.name || "Untitled Shop"}</strong>
                           <p className="muted-text">{businessTypeLabel(shop.businessType, shop.businessTypeCustom, t)}</p>
-                          <span className="muted-text">{shop.mobile || "--"}</span>
+                          <span className="muted-text" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            {shop.mobile || "--"}
+                            {(shop.viewCount || 0) > 0 && <b style={{ color: "var(--brand)" }}>• {shop.viewCount} {t("viewCount")}</b>}
+                          </span>
                         </div>
                         <span className="arrow">→</span>
                       </button>
@@ -319,7 +322,10 @@ export default function AdminPage() {
                   <button className="ghost-action-btn back-btn" onClick={() => setPreviewShopId(null)}>
                     ← {t("back")}
                   </button>
-                  <h3>{previewShop.name || "Untitled Shop"}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3>{previewShop.name || "Untitled Shop"}</h3>
+                    {(previewShop.viewCount || 0) > 0 && <span style={{ background: '#eaf8f7', color: 'var(--brand-dark)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 'bold' }}>{previewShop.viewCount} {t("viewCount")}</span>}
+                  </div>
                   <p className="muted-text">{businessTypeLabel(previewShop.businessType, previewShop.businessTypeCustom, t)}</p>
                   {previewShop.mobile && <p>{previewShop.mobile}</p>}
                   {previewShop.description && <p>{previewShop.description}</p>}

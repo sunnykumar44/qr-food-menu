@@ -89,7 +89,9 @@ const dictionary = {
     selectShopHint: "Select or create a shop to manage details and menu.",
     viewRecentQR: "View Recent QR Created",
     back: "Back",
-    addItemPlaceholder: "Example: Dosa"
+    searchItems: "Search for an item...",
+    noItemsFound: "No items match your search.",
+    viewCount: "views"
   },
   te: {
     appTitle: "QR ఫుడ్ మెనూ బిల్డర్",
@@ -179,7 +181,9 @@ const dictionary = {
     selectShopHint: "వివరాలు మరియు మెనూ నిర్వహించడానికి షాప్ ఎంచుకోండి లేదా సృష్టించండి.",
     viewRecentQR: "ఇటీవల సృష్టించిన QR చూడండి",
     back: "వెనుకకు",
-    addItemPlaceholder: "ఉదాహరణ: దోసె"
+    searchItems: "మెనూ వెతకండి...",
+    noItemsFound: "వెతుకులాట కు సరిపోలే అంశాలు లేవు.",
+    viewCount: "సార్లు చూసారు"
   }
 };
 

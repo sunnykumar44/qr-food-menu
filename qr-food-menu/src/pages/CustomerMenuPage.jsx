@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AppTranslator from "../components/AppTranslator";
-import { defaultMenuSections, subscribeShop } from "../firebase";
+import { defaultMenuSections, subscribeShop, incrementShopViewCount } from "../firebase";
 import { useI18n } from "../i18n.jsx";
 import { groupMenuItems } from "../utils";
 
@@ -11,12 +11,20 @@ export default function CustomerMenuPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [shop, setShop] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!shopId) {
       setIsLoading(false);
       setLoadError(t("invalidMenuLink"));
       return undefined;
+    }
+
+    // Only increment the view count once per hard refresh/visit to prevent spam
+    const hasViewedKey = `qr_viewed_${shopId}`;
+    if (!sessionStorage.getItem(hasViewedKey)) {
+      incrementShopViewCount(shopId);
+      sessionStorage.setItem(hasViewedKey, "true");
     }
 
     setIsLoading(true);
@@ -68,6 +76,16 @@ export default function CustomerMenuPage() {
   const sections = allSections.filter((section) => section.enabled !== false);
   const hasAnyItems = sections.some((section) => grouped[section.id]?.length > 0);
 
+  const filteredSections = sections.map(section => {
+    const items = grouped[section.id] || [];
+    const filteredItems = searchTerm 
+      ? items.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      : items;
+    return { ...section, items: filteredItems };
+  }).filter(section => section.items.length > 0);
+
+  const hasFilteredItems = filteredSections.length > 0;
+
   return (
     <div className="customer-page card">
       <div className="customer-head">
@@ -87,17 +105,29 @@ export default function CustomerMenuPage() {
         </div>
       )}
 
-      {!hasAnyItems && <p>{t("noItems")}</p>}
+      {hasAnyItems && (
+        <div className="search-bar-wrap">
+          <input 
+            type="search" 
+            placeholder={t("searchItems")} 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+            className="menu-search-input"
+          />
+        </div>
+      )}
 
-      {sections.map((section) => {
-        const items = grouped[section.id] || [];
-        if (items.length === 0) return null;
+      {!hasAnyItems && <p>{t("noItems")}</p>}
+      {hasAnyItems && !hasFilteredItems && <p>{t("noItemsFound")}</p>}
+
+      {filteredSections.map((section) => {
+        if (section.items.length === 0) return null;
 
         return (
           <section className="menu-section" key={section.id}>
             <h3>{section.label || t("sectionHeading")}</h3>
             <div className="customer-menu-grid">
-              {items.map((item) => {
+              {section.items.map((item) => {
                 const showPrice = String(item.price || "").trim().length > 0;
                 return (
                   <article className="customer-item" key={item.id}>
