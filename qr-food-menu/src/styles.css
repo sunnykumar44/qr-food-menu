@@ -290,7 +290,7 @@ select {
 
 .menu-row {
   display: grid;
-  grid-template-columns: 132px 1fr 120px 90px;
+  grid-template-columns: 132px 1fr 100px 100px 90px;
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
@@ -304,7 +304,7 @@ select {
 
 .add-item-row {
   display: grid;
-  grid-template-columns: 1fr 140px auto;
+  grid-template-columns: 1fr 100px 100px auto;
   gap: 8px;
 }
 
@@ -737,9 +737,42 @@ select {
   flex: 0 1 auto;
 }
 
-.customer-item p {
+.item-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0 0 8px;
+}
+
+.item-name-wrap p {
+  margin: 0;
   font-weight: 600;
+}
+
+.diet-icon {
+  width: 14px;
+  height: 14px;
+  border: 1px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+}
+
+.diet-icon::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.diet-icon.veg {
+  color: #16a34a; /* green-600 */
+}
+
+.diet-icon.non-veg {
+  color: #dc2626; /* red-600 */
 }
 
 .modal-backdrop {
@@ -816,6 +849,7 @@ select {
 
   .menu-row {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .section-head-row {
@@ -828,6 +862,7 @@ select {
 
   .add-item-row {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .customer-head {

@@ -131,7 +131,11 @@ export default function CustomerMenuPage() {
                 const showPrice = String(item.price || "").trim().length > 0;
                 return (
                   <article className="customer-item" key={item.id}>
-                    <p>{item.name}</p>
+                    <div className="item-name-wrap">
+                      {item.dietary === "veg" && <div className="diet-icon veg" title={t("veg")}></div>}
+                      {item.dietary === "non-veg" && <div className="diet-icon non-veg" title={t("nonVeg")}></div>}
+                      <p>{item.name}</p>
+                    </div>
                     {showPrice && <strong>Rs. {item.price}</strong>}
                   </article>
                 );

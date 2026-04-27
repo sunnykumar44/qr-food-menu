@@ -182,6 +182,19 @@ export default function AdminPage() {
     }
   };
 
+  const handleBulkImport = async (nextSections, nextItems) => {
+    if (!selectedShop) return;
+    try {
+      await updateShop(selectedShop.id, {
+        menuSections: nextSections,
+        menuItems: nextItems
+      });
+      setToast(t("updateSuccess"));
+    } catch {
+      setStatus(t("updateFailed"));
+    }
+  };
+
   const handleDeleteShop = () => {
     if (!selectedShop) return;
     setDeleteConfirm(selectedShop);
@@ -447,6 +460,7 @@ export default function AdminPage() {
                   menuSections={visibleMenuSections}
                   onItemsChange={handleMenuItemsChange}
                   onSectionsChange={handleMenuSectionsChange}
+                  onBulkImport={handleBulkImport}
                 />
                 <QrActions shopId={selectedShop.id} />
               </>

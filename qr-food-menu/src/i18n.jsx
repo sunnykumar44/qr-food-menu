@@ -91,7 +91,13 @@ const dictionary = {
     back: "Back",
     searchItems: "Search for an item...",
     noItemsFound: "No items match your search.",
-    viewCount: "views"
+    viewCount: "views",
+    dietary: "Dietary",
+    veg: "Veg",
+    nonVeg: "Non-Veg",
+    none: "None",
+    importCsv: "Import CSV",
+    csvFormatHint: "Format: Section, Item Name, Price, Veg/Non-Veg"
   },
   te: {
     appTitle: "QR ఫుడ్ మెనూ బిల్డర్",
@@ -183,7 +189,13 @@ const dictionary = {
     back: "వెనుకకు",
     searchItems: "మెనూ వెతకండి...",
     noItemsFound: "వెతుకులాట కు సరిపోలే అంశాలు లేవు.",
-    viewCount: "సార్లు చూసారు"
+    viewCount: "సార్లు చూసారు",
+    dietary: "ఆహార రకం",
+    veg: "శాఖాహారం",
+    nonVeg: "మాంసాహారం",
+    none: "ఏదీ లేదు",
+    importCsv: "CSV లోడ్ చేయండి",
+    csvFormatHint: "ఫార్మాట్: సెక్షన్, ఐటం, ధర, వేజ్/నాన్-వెజ్"
   }
 };
 
