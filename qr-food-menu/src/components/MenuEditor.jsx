@@ -1,7 +1,26 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useI18n } from "../i18n.jsx";
+import { uploadShopImages } from "../firebase.js";
 
-function ItemRow({ item, onToggle, onName, onPrice, onDietary, onDelete, t }) {
+function ItemRow({ item, onToggle, onName, onPrice, onDietary, onDelete, onImageUpload, t }) {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const [url] = await uploadShopImages("item", [file]);
+      onImageUpload(url);
+    } catch (err) {
+      alert("Image upload failed: " + err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = null;
+    }
+  };
+
   return (
     <div className="menu-row">
       <label className="checkbox-wrap">
@@ -9,7 +28,10 @@ function ItemRow({ item, onToggle, onName, onPrice, onDietary, onDelete, t }) {
         <span>{t("enabled")}</span>
       </label>
 
-      <input value={item.name} onChange={(e) => onName(e.target.value)} aria-label={t("itemName")} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', position: 'relative' }}>
+        <input value={item.name} onChange={(e) => onName(e.target.value)} aria-label={t("itemName")} placeholder={t("itemName")} />
+        {item.imageUrl && <img src={item.imageUrl} alt={item.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', position: 'absolute', right: '4px', top: '4px' }} />}
+      </div>
 
       <select value={item.dietary || "none"} onChange={(e) => onDietary(e.target.value)} aria-label={t("dietary")}>
         <option value="none">{t("none")}</option>
@@ -23,11 +45,18 @@ function ItemRow({ item, onToggle, onName, onPrice, onDietary, onDelete, t }) {
         type="number"
         min="0"
         aria-label={t("price")}
+        placeholder={t("price")}
       />
 
-      <button className="danger-btn" onClick={onDelete} type="button">
-        {t("delete")}
-      </button>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        <input type="file" ref={fileInputRef} accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+        <button className="primary-btn secondary-btn" onClick={() => fileInputRef.current?.click()} type="button" disabled={uploading}>
+          {uploading ? "..." : (item.imageUrl ? t("edit") : t("image"))}
+        </button>
+        <button className="danger-btn" onClick={onDelete} type="button">
+          {t("delete")}
+        </button>
+      </div>
     </div>
   );
 }
@@ -212,6 +241,7 @@ export default function MenuEditor({ menuItems = [], menuSections = [], onItemsC
                 onName={(value) => updateItem(item.id, { name: value })}
                 onDietary={(value) => updateItem(item.id, { dietary: value })}
                 onPrice={(value) => updateItem(item.id, { price: value })}
+                onImageUpload={(url) => updateItem(item.id, { imageUrl: url })}
                 onDelete={() => removeItem(item.id)}
                 t={t}
               />

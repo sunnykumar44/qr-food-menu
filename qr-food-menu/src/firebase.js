@@ -6,6 +6,7 @@ import {
   doc,
   onSnapshot,
   query,
+  orderBy,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -266,5 +267,37 @@ export async function uploadShopImages(shopId, files) {
       throw new Error("Image upload failed. Check VITE_IMGBB_API_KEY and your internet connection.");
     }
     throw error;
+  }
+}
+
+export async function addFeedback(shopId, data) {
+  if (!db) return;
+  try {
+    const feedbackRef = collection(doc(db, "shops", shopId), "feedback");
+    await addDoc(feedbackRef, {
+      ...data,
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Failed to add feedback", error);
+  }
+}
+
+export function subscribeToFeedback(shopId, onUpdate) {
+  if (!db || !shopId) return () => {};
+  try {
+    const feedbackRef = collection(doc(db, "shops", shopId), "feedback");
+    const q = query(feedbackRef, orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snapshot) => {
+      const results = [];
+      snapshot.forEach((docSpan) => {
+        results.push({ id: docSpan.id, ...docSpan.data() });
+      });
+      onUpdate(results);
+    });
+  } catch (error) {
+    console.error("Failed to subscribe to feedback", error);
+    onUpdate([]);
+    return () => {};
   }
 }

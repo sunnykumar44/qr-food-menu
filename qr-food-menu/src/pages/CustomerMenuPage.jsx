@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AppTranslator from "../components/AppTranslator";
-import { defaultMenuSections, subscribeShop, incrementShopViewCount } from "../firebase";
+import { defaultMenuSections, subscribeShop, incrementShopViewCount, addFeedback } from "../firebase";
 import { useI18n } from "../i18n.jsx";
 import { groupMenuItems } from "../utils";
 
@@ -12,6 +12,9 @@ export default function CustomerMenuPage() {
   const [loadError, setLoadError] = useState("");
   const [shop, setShop] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [feedback, setFeedback] = useState({ name: "", comments: "" });
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     if (!shopId) {
@@ -130,13 +133,20 @@ export default function CustomerMenuPage() {
               {section.items.map((item) => {
                 const showPrice = String(item.price || "").trim().length > 0;
                 return (
-                  <article className="customer-item" key={item.id}>
-                    <div className="item-name-wrap">
-                      {item.dietary === "veg" && <div className="diet-icon veg" title={t("veg")}></div>}
-                      {item.dietary === "non-veg" && <div className="diet-icon non-veg" title={t("nonVeg")}></div>}
-                      <p>{item.name}</p>
+                  <article className="customer-item" key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <div className="item-name-wrap">
+                        {item.dietary === "veg" && <div className="diet-icon veg" title={t("veg")}></div>}
+                        {item.dietary === "non-veg" && <div className="diet-icon non-veg" title={t("nonVeg")}></div>}
+                        <p>{item.name}</p>
+                      </div>
+                      {showPrice && <strong>Rs. {item.price}</strong>}
                     </div>
-                    {showPrice && <strong>Rs. {item.price}</strong>}
+                    {item.imageUrl && (
+                      <div style={{ marginLeft: '12px' }}>
+                        <img src={item.imageUrl} alt={item.name} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                      </div>
+                    )}
                   </article>
                 );
               })}
@@ -144,6 +154,42 @@ export default function CustomerMenuPage() {
           </section>
         );
       })}
+
+      <div style={{ marginTop: "40px", padding: "20px", background: "#fff", borderRadius: "8px", boxShadow: "rgb(0 0 0 / 10%) 0px 4px 12px" }}>
+        <h3>{t("customerFeedback") || "Customer Feedback"}</h3>
+        {feedbackSent ? (
+          <p style={{ color: "green" }}>{t("feedbackSent") || "Thank you for your feedback!"}</p>
+        ) : (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!feedback.comments.trim()) return;
+              await addFeedback(shopId, feedback);
+              setFeedbackSent(true);
+            }}
+            style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}
+          >
+            <input 
+              placeholder={t("yourName") || "Your Name (Optional)"}
+              value={feedback.name}
+              onChange={(e) => setFeedback({ ...feedback, name: e.target.value })}
+              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            />
+            <textarea
+              placeholder={t("yourComments") || "Your Comments"}
+              value={feedback.comments}
+              onChange={(e) => setFeedback({ ...feedback, comments: e.target.value })}
+              required
+              rows={3}
+              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            />
+            <button type="submit" className="primary-btn" style={{ alignSelf: "flex-start" }}>
+              {t("submitFeedback") || "Submit"}
+            </button>
+          </form>
+        )}
+      </div>
+
     </div>
   );
 }

@@ -97,7 +97,12 @@ const dictionary = {
     nonVeg: "Non-Veg",
     none: "None",
     importCsv: "Import CSV",
-    csvFormatHint: "Format: Section, Item Name, Price, Veg/Non-Veg"
+    csvFormatHint: "Format: Section, Item Name, Price, Veg/Non-Veg",
+    customerFeedback: "Customer Feedback",
+    feedbackSent: "Thank you for your feedback!",
+    yourName: "Your Name (Optional)",
+    yourComments: "Your Comments",
+    submitFeedback: "Submit",
   },
   te: {
     appTitle: "QR ఫుడ్ మెనూ బిల్డర్",

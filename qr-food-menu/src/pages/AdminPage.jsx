@@ -11,7 +11,8 @@ import {
   deleteShop,
   subscribeShops,
   updateShop,
-  uploadShopImages
+  uploadShopImages,
+  subscribeToFeedback
 } from "../firebase";
 import { useI18n } from "../i18n.jsx";
 import { businessTypeLabel } from "../utils";
@@ -32,6 +33,7 @@ export default function AdminPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showRecentQR, setShowRecentQR] = useState(false);
   const [previewShopId, setPreviewShopId] = useState(null);
+  const [feedbacks, setFeedbacks] = useState([]);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -45,6 +47,14 @@ export default function AdminPage() {
     });
     return unsubscribe;
   }, [t]);
+
+  useEffect(() => {
+    if (selectedShopId) {
+      return subscribeToFeedback(selectedShopId, setFeedbacks);
+    } else {
+      setFeedbacks([]);
+    }
+  }, [selectedShopId]);
 
   const selectedShop = useMemo(
     () => shops.find((shop) => shop.id === selectedShopId) || null,
@@ -469,6 +479,26 @@ export default function AdminPage() {
                   onSectionsChange={handleMenuSectionsChange}
                   onBulkImport={handleBulkImport}
                 />
+                
+                <section className="card">
+                  <h2>{t("customerFeedback") || "Customer Feedback"}</h2>
+                  {feedbacks.length === 0 ? (
+                    <p className="muted-text">No feedback yet.</p>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {feedbacks.map((f) => (
+                        <div key={f.id} style={{ padding: "10px", border: "1px solid #eee", borderRadius: "4px" }}>
+                          <strong>{f.name || "Anonymous"}</strong>
+                          <span className="muted-text" style={{ fontSize: "0.85rem", marginLeft: "10px" }}>
+                            {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleDateString() : ""}
+                          </span>
+                          <p style={{ marginTop: "5px" }}>{f.comments}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
                 <QrActions shopId={selectedShop.id} />
               </>
             )}
