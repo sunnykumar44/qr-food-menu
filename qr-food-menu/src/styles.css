@@ -512,11 +512,34 @@ select {
   padding: 4px 8px;
 }
 
+.recent-shops-list-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  gap: 10px;
+}
+
 .recent-shops-list {
   overflow-y: auto;
   flex: 1;
   display: grid;
   gap: 10px;
+}
+
+.recent-shops-footer {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  text-align: right;
+}
+
+.danger-text {
+  color: var(--danger) !important;
+  border-color: #fee4e2 !important;
+}
+
+.danger-text:hover {
+  background: #fee4e2 !important;
 }
 
 .recent-shop-item {

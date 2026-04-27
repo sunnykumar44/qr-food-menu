@@ -199,14 +199,22 @@ export default function AdminPage() {
     setIsDeleting(true);
 
     try {
-      await deleteShop(deleteConfirm.id);
-      setToast(t("shopDeleted"));
-      if (selectedShopId === deleteConfirm.id) {
+      if (deleteConfirm.id === "ALL") {
+        await Promise.all(shops.map((shop) => deleteShop(shop.id)));
+        setToast(t("allShopsDeleted"));
         setSelectedShopId("");
-        setIsCreatingNew(false);
-      }
-      if (previewShopId === deleteConfirm.id) {
         setPreviewShopId(null);
+        setIsCreatingNew(false);
+      } else {
+        await deleteShop(deleteConfirm.id);
+        setToast(t("shopDeleted"));
+        if (selectedShopId === deleteConfirm.id) {
+          setSelectedShopId("");
+          setIsCreatingNew(false);
+        }
+        if (previewShopId === deleteConfirm.id) {
+          setPreviewShopId(null);
+        }
       }
       setDeleteConfirm(null);
     } catch (error) {
@@ -245,7 +253,7 @@ export default function AdminPage() {
             }}
           >
             <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
-              <h3>{t("confirmDeleteShop")}</h3>
+              <h3>{deleteConfirm.id === "ALL" ? t("confirmDeleteAllShops") : t("confirmDeleteShop")}</h3>
               <p className="delete-modal-shop-name">{deleteConfirm.name || "Untitled Shop"}</p>
               <p className="muted-text delete-modal-hint">{t("deleteActionCannot")}</p>
               <div className="delete-modal-actions">
@@ -278,18 +286,33 @@ export default function AdminPage() {
               </div>
 
               {!previewShopId ? (
-                <div className="recent-shops-list">
-                  {shops.length === 0 && <p className="muted-text">{t("noShops")}</p>}
-                  {shops.map((shop) => (
-                    <button key={shop.id} className="recent-shop-item" onClick={() => setPreviewShopId(shop.id)}>
-                      <div className="recent-shop-info">
-                        <strong>{shop.name || "Untitled Shop"}</strong>
-                        <p className="muted-text">{businessTypeLabel(shop.businessType, shop.businessTypeCustom, t)}</p>
-                        <span className="muted-text">{shop.mobile || "--"}</span>
-                      </div>
-                      <span className="arrow">→</span>
-                    </button>
-                  ))}
+                <div className="recent-shops-list-wrap">
+                  <div className="recent-shops-list">
+                    {shops.length === 0 && <p className="muted-text">{t("noShops")}</p>}
+                    {shops.map((shop) => (
+                      <button key={shop.id} className="recent-shop-item" onClick={() => setPreviewShopId(shop.id)}>
+                        <div className="recent-shop-info">
+                          <strong>{shop.name || "Untitled Shop"}</strong>
+                          <p className="muted-text">{businessTypeLabel(shop.businessType, shop.businessTypeCustom, t)}</p>
+                          <span className="muted-text">{shop.mobile || "--"}</span>
+                        </div>
+                        <span className="arrow">→</span>
+                      </button>
+                    ))}
+                  </div>
+                  {shops.length > 0 && (
+                    <div className="recent-shops-footer">
+                      <button 
+                        className="ghost-action-btn danger-text" 
+                        onClick={() => {
+                          setShowRecentQR(false);
+                          setDeleteConfirm({ id: "ALL", name: t("allShops") });
+                        }}
+                      >
+                        {t("deleteAll")}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : previewShop ? (
                 <div className="recent-qr-detail">
