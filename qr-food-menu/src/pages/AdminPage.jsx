@@ -352,7 +352,14 @@ export default function AdminPage() {
                   )}
 
                   <div className="recent-qr-code-section">
-                    <QrActions shopId={previewShop.id} />
+                    <QrActions 
+                      shopId={previewShop.id} 
+                      onEdit={() => {
+                        setShowRecentQR(false);
+                        setSelectedShopId(previewShop.id);
+                        setIsCreatingNew(false);
+                      }}
+                    />
                   </div>
 
                   <div className="recent-detail-actions">

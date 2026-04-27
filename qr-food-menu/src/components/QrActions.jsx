@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useI18n } from "../i18n.jsx";
 
-export default function QrActions({ shopId }) {
+export default function QrActions({ shopId, onEdit }) {
   const { t } = useI18n();
   const qrRef = useRef(null);
   const [showMenuUrl, setShowMenuUrl] = useState(false);
@@ -123,6 +123,10 @@ export default function QrActions({ shopId }) {
   };
 
   const scrollToEdit = () => {
+    if (onEdit) {
+      onEdit();
+      return;
+    }
     document.querySelector(".shop-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
