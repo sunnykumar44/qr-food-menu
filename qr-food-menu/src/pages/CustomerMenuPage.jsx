@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AppTranslator from "../components/AppTranslator";
-import { defaultMenuSections, subscribeShop, incrementShopViewCount, addFeedback } from "../firebase";
+import { defaultMenuSections, subscribeShop, incrementShopViewCount, addFeedback, subscribeToFeedback } from "../firebase";
 import { useI18n } from "../i18n.jsx";
 import { groupMenuItems } from "../utils";
 
@@ -14,6 +14,7 @@ export default function CustomerMenuPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [feedback, setFeedback] = useState({ name: "", comments: "" });
+  const [feedbacks, setFeedbacks] = useState([]);
   const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
@@ -22,6 +23,8 @@ export default function CustomerMenuPage() {
       setLoadError(t("invalidMenuLink"));
       return undefined;
     }
+
+    const unsubscribeFeedback = subscribeToFeedback(shopId, setFeedbacks);
 
     // Only increment the view count once per hard refresh/visit to prevent spam
     const hasViewedKey = `qr_viewed_${shopId}`;
@@ -56,6 +59,7 @@ export default function CustomerMenuPage() {
     return () => {
       clearTimeout(timeoutRef);
       unsubscribe();
+      unsubscribeFeedback();
     };
   }, [shopId, t]);
 
@@ -157,6 +161,21 @@ export default function CustomerMenuPage() {
 
       <div style={{ marginTop: "40px", padding: "20px", background: "#fff", borderRadius: "8px", boxShadow: "rgb(0 0 0 / 10%) 0px 4px 12px" }}>
         <h3>{t("customerFeedback") || "Customer Feedback"}</h3>
+
+        {feedbacks.length > 0 && (
+          <div style={{ margin: "15px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
+            {feedbacks.map((f) => (
+              <div key={f.id} style={{ padding: "10px", backgroundColor: "#f9f9f9", borderRadius: "4px", border: "1px solid #eee" }}>
+                <strong>{f.name || "Anonymous"}</strong>
+                <span className="muted-text" style={{ fontSize: "0.85rem", marginLeft: "10px" }}>
+                  {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString() : ""}
+                </span>
+                <p style={{ marginTop: "5px" }}>{f.comments}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {feedbackSent && (
           <p style={{ color: "green", marginBottom: "10px" }}>{t("feedbackSent") || "Thank you for your feedback!"}</p>
         )}
