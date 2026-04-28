@@ -12,8 +12,10 @@ import {
   subscribeShops,
   updateShop,
   uploadShopImages,
-  subscribeToFeedback
+  subscribeToFeedback,
+  deleteFeedback
 } from "../firebase";
+import AppTranslator from "../components/AppTranslator";
 import { useI18n } from "../i18n.jsx";
 import { businessTypeLabel } from "../utils";
 
@@ -263,8 +265,15 @@ export default function AdminPage() {
     setStatus("");
   };
 
+  const handleDeleteFeedback = async (shopId, feedbackId) => {
+    if (window.confirm("Are you sure you want to delete this feedback?")) {
+      await deleteFeedback(shopId, feedbackId);
+    }
+  };
+
   return (
     <div className={`admin-layout ${isCreatingNew ? "creation-mode" : ""}`}>
+      <AppTranslator />
       <section className="admin-main">
         {deleteConfirm && (
           <div
@@ -487,11 +496,19 @@ export default function AdminPage() {
                   ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                       {feedbacks.map((f) => (
-                        <div key={f.id} style={{ padding: "10px", border: "1px solid #eee", borderRadius: "4px" }}>
+                        <div key={f.id} style={{ padding: "10px", border: "1px solid #eee", borderRadius: "4px", position: "relative" }}>
                           <strong>{f.name || "Anonymous"}</strong>
                           <span className="muted-text" style={{ fontSize: "0.85rem", marginLeft: "10px" }}>
-                            {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleDateString() : ""}
+                            {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString() : ""}
                           </span>
+                          <button 
+                            className="ghost-action-btn danger-text" 
+                            style={{ position: "absolute", top: "10px", right: "10px", padding: "0" }}
+                            onClick={() => handleDeleteFeedback(selectedShop.id, f.id)}
+                            title="Delete Feedback"
+                          >
+                            ×
+                          </button>
                           <p style={{ marginTop: "5px" }}>{f.comments}</p>
                         </div>
                       ))}

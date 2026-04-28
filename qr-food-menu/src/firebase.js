@@ -301,3 +301,12 @@ export function subscribeToFeedback(shopId, onUpdate) {
     return () => {};
   }
 }
+
+export async function deleteFeedback(shopId, feedbackId) {
+  if (!db || !shopId || !feedbackId) return;
+  try {
+    await deleteDoc(doc(db, "shops", shopId, "feedback", feedbackId));
+  } catch (error) {
+    console.error("Failed to delete feedback", error);
+  }
+}

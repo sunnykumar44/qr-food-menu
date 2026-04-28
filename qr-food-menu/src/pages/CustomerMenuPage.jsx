@@ -157,37 +157,39 @@ export default function CustomerMenuPage() {
 
       <div style={{ marginTop: "40px", padding: "20px", background: "#fff", borderRadius: "8px", boxShadow: "rgb(0 0 0 / 10%) 0px 4px 12px" }}>
         <h3>{t("customerFeedback") || "Customer Feedback"}</h3>
-        {feedbackSent ? (
-          <p style={{ color: "green" }}>{t("feedbackSent") || "Thank you for your feedback!"}</p>
-        ) : (
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              if (!feedback.comments.trim()) return;
-              await addFeedback(shopId, feedback);
-              setFeedbackSent(true);
-            }}
-            style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}
-          >
-            <input 
-              placeholder={t("yourName") || "Your Name (Optional)"}
-              value={feedback.name}
-              onChange={(e) => setFeedback({ ...feedback, name: e.target.value })}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
-            <textarea
-              placeholder={t("yourComments") || "Your Comments"}
-              value={feedback.comments}
-              onChange={(e) => setFeedback({ ...feedback, comments: e.target.value })}
-              required
-              rows={3}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
-            <button type="submit" className="primary-btn" style={{ alignSelf: "flex-start" }}>
-              {t("submitFeedback") || "Submit"}
-            </button>
-          </form>
+        {feedbackSent && (
+          <p style={{ color: "green", marginBottom: "10px" }}>{t("feedbackSent") || "Thank you for your feedback!"}</p>
         )}
+        
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!feedback.comments.trim()) return;
+            await addFeedback(shopId, feedback);
+            setFeedbackSent(true);
+            setFeedback({ name: "", comments: "" });
+            setTimeout(() => setFeedbackSent(false), 3000);
+          }}
+          style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}
+        >
+          <input 
+            placeholder={t("yourName") || "Your Name (Optional)"}
+            value={feedback.name}
+            onChange={(e) => setFeedback({ ...feedback, name: e.target.value })}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <textarea
+            placeholder={t("yourComments") || "Your Comments"}
+            value={feedback.comments}
+            onChange={(e) => setFeedback({ ...feedback, comments: e.target.value })}
+            required
+            rows={3}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <button type="submit" className="primary-btn" style={{ alignSelf: "flex-start" }}>
+            {t("submitFeedback") || "Submit"}
+          </button>
+        </form>
       </div>
 
     </div>
